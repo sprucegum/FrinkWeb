@@ -1,0 +1,25 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN"
+   "http://www.w3.org/TR/html4/strict.dtd">
+<HTML>
+	<HEAD>
+		<LINK href="/static/frinkstyle.css" rel="stylesheet" type="text/css">
+		<TITLE>Dr.Frinks Funhouse Stats</TITLE>
+	</HEAD>
+	<BODY>
+		<div id=main>
+			<div id="drfrink">Dr.Frink's</div>
+			<div id="funhouse">LABORATORY</div>
+		
+			{% if top_players %}
+			    <div id="top10"><h1>Top {{top_players.count}}</h1><table id="top10t">
+				<tr><th>Rank</th><th>Player</th><th>Kills</th><th>Deaths</th></tr>
+				{% for player in top_players %}
+					<tr><td>{{forloop.counter}}</td><td><a href="/player/{{ player.name }}">{{ player.printedname }}</a></td><td> {{player.kills}}</td><td>{{player.deaths}}</td></tr>
+				{% endfor %}
+			    </table></div>
+			{% else %}
+			    <p>No players are available.</p>
+			{% endif %}
+		</div>
+	</BODY>
+</HTML>

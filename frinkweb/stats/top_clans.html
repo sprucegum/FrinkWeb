@@ -1,0 +1,45 @@
+{% extends "frink.html" %}
+
+{% block javascript %}
+<script>
+	$(document).ready(function() 
+		{ 
+			$("table").tablesorter({sortList: [[1,1],[3,1]]});
+			
+		} 
+	);
+</script>
+{% endblock %}
+
+{% block style %}
+	<style type="text/css">
+		#top_clans {background-color:#900;}
+	</style>
+{% endblock %}
+
+{% block content %}	
+			<div class="toplist" id="top10"><h1>Top {{count}}</h1>
+				<table id="top10t">
+					<thead>
+						<tr>
+							<th>Clan</th>
+							<th>Kills</th>
+							<th>Deaths</th>
+							<th>K:D</th>
+							<th>#</th>
+						</tr>
+					</thead>
+					<tbody>
+					{% for clan in top_clans %}
+						<tr>
+							<td><a href="/clan/{{ clan.name }}/{{timespan}}">{{ clan.name }}</a></td>
+							<td>{{clan.kills}}</td>
+							<td>{{clan.deaths}}</td>
+							<td>{{clan.kd}}</td>
+							<td>{{clan.members}}</td>
+						</tr>
+					{% endfor %}
+					</tbody>
+				</table>
+			</div>
+{% endblock %}

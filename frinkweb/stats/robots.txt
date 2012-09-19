@@ -1,0 +1,4 @@
+User-agent: *
+{% for dir in dirs %}
+Disallow: {{ dir }}
+{% endfor %}

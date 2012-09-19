@@ -1,0 +1,73 @@
+{% extends "frink.html" %}
+{% block javascript %}
+	<script type="text/javascript" src="/static/jquery-1.8.0.min.js"></script> 
+	<script type="text/javascript" src="/static/jquery.tablesorter.min.js"></script> 
+	<script>
+		var HOSTNAME = '192.168.0.90';
+		var plist = [{% for player in clan_players %}"{{player.name}}",{% endfor %}];
+		$(document).ready(function() 
+		    { 
+				$("table").tablesorter(); 
+				checkGold(0);
+		    } 
+		    
+		);
+		function checkGold(i){
+					$.getJSON('http://'+HOSTNAME+'/kagapi/player/' + plist[i] + '/avatar',function(data){
+						$('#'+plist[i]+"imgslot").replaceWith("<td><img onerror=\"$('#" + plist[i] + "img').hide()\" id=\""+plist[i]+"img\" class=\"player_pic\" src=\"" + data["small"] + "\"/></td>");
+					});
+					$.getJSON('http://'+HOSTNAME+'/kagapi/player/'+plist[i]+'/info',function(data){
+						if (data["gold"]){
+							$('#'+plist[i]).css("text-shadow","0px 0px 12px #FD0");
+							$('#'+plist[i]).css("color","#FD3");
+						}
+						
+						if (i < plist.length){
+							checkGold(i+1)
+						}
+					});
+			}
+	</script>
+{% endblock %}
+
+{% block style %}
+	<style type="text/css">
+		#top_clans {background-color:#900;}
+		.player_pic {
+			max-height:24px;
+			position:relative;
+			background-color:#FFF;
+			opacity: 0.9;
+			-moz-box-shadow: 0px 0px 10px #FFF;
+			-webkit-box-shadow: 0px 0px 10px #FFF;
+			box-shadow: 0px 0px 10px #FFF;
+			border:2px solid #FFF;
+		}
+	</style>
+{% endblock %}
+
+{% block content %}	
+    <div id="top10"><h1>{{clan_name}}</h1><table id="top10t">
+	<thead>
+		<tr>
+			<th></th>
+			<th>Rank</th>
+			<th>Player</th>
+			<th>Kills</th>
+			<th>Deaths</th>
+			<th>K:D</th>
+		</tr>
+	</thead>
+	{% for player in clan_players %}
+		<tr>
+			<td id="{{player.name}}imgslot"></td>
+			<td>{{forloop.counter}}</td>
+			<td><a id="{{player.name}}" href="/player/{{ player.name }}/{{timespan}}">{{ player.name }}</a></td>
+			<td>{{player.kills}}</td>
+			<td>{{player.deaths}}</td>
+			<td>{{player.kd}}</td>
+		</tr>
+	{% endfor %}
+    </table></div>
+
+{% endblock %}

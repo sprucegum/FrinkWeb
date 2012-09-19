@@ -1,0 +1,86 @@
+{% extends "frink.html" %}
+
+{% block style %}
+	<style type="text/css">
+		#top_players {background-color:#900;}
+		#banner {
+			font-size:24px;
+			position: fixed;
+			left:16px;
+			bottom:80px;
+			width:128px;
+		}
+		#avatar {
+			position: fixed;
+			bottom:132px;
+			left:16px;
+			width:128px;
+			background-color: #FFF;		
+		}
+		#pname {
+			display: inline-block;
+		}
+	</style>
+{% endblock %}
+
+{% block javascript %}
+		<script>
+			$(document).ready(function() 
+			    { 
+					var HOSTNAME = '192.168.0.90';
+					$("table").tablesorter(); 
+					$.getJSON('http://'+HOSTNAME+'/kagapi/player/{{player.name}}/avatar',function(data){
+						$('#avatar').replaceWith("<img onerror=\"$('#avatar').hide()\" class=\"timespan\" id=\"avatar\" src=\"" + data["medium"] + "\"/>");
+						
+					});
+					$.getJSON('http://'+HOSTNAME+'/kagapi/player/{{player.name}}/info',function(data){
+							if (data["gold"]){
+								$('#pname').css("text-shadow","0px 0px 12px #FD0");
+								$('#pname').css("color","#FD3");
+							}
+					});
+			    } 
+			);
+			
+		</script>
+{% endblock %}
+
+
+{% block content %}
+	<div id="banner" class="timespan"><a href='/player/{{player.name}}.png'>Banner</a></div>
+	<div id="player"><img id="avatar"></img><h1><a href="/clan/{{clan}}/">{{clan}}</a> <div id="pname">{{player.name}}</div></h1>
+		<div id="stats">
+			<span id="kills">
+				<span id="lkills"><a href="/player/{{player.name}}/{{timespan}}/{{pageinfo.kback}}/{{pageinfo.d}}">&lt</a></span>
+				Kills
+				<span id="mkills"><a href="/player/{{player.name}}/{{timespan}}/{{pageinfo.knext}}/{{pageinfo.d}}"%}>&gt</a></span>
+				<table>
+					<thead><tr><th>Victim</th><th>Weapon</th></tr></thead>
+					{% for kill in kills %}
+						<tr><td><a href="/player/{{ kill.victim.name }}/{{timespan}}">{{ kill.victim.name }}</a></td><td> {{kill.weapon.name}}</td></tr>
+					{% endfor %}
+		    		</table>
+				{{pageinfo.kpage}}/{{nk}}
+			</span>
+			<span id="deaths">
+				<span id="ldeaths"><a href="/player/{{player.name}}/{{timespan}}/{{pageinfo.k}}/{{pageinfo.dback}}">&lt</a></span>
+				Deaths
+				<span id="mdeaths"><a href="/player/{{player.name}}/{{timespan}}/{{pageinfo.k}}/{{pageinfo.dnext}}">&gt</a></span>
+				<table >
+					<thead><tr><th>Killer</th><th>Weapon</th></tr></thead>
+					<tbody>
+					{% for kill in deaths %}
+						<tr><td><a href="/player/{{ kill.player.name }}/{{timespan}}">{{ kill.player.name }}</a></td><td> {{kill.weapon.name}}</td></tr>
+					{% endfor %}
+					</tbody>
+			    	</table>
+				{{pageinfo.dpage}}/{{nd}}
+			</span>
+		</div>
+	</div>
+{% endblock %}
+
+
+
+
+

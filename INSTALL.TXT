@@ -1,0 +1,50 @@
+# To install Frink Stats, extract the archive into your KAG server directory. #
+
+## THE FOLLOWING FILES NEED TO BE CONFIGURED MANUALLY!
+kagserv.py
+frinkweb/settings.py
+frinkweb/logparser.py
+frinkweb/stats/player.html
+frinkweb/stats/clan.html
+frinkweb/stats/banner.py
+frinkweb/stats/frink.html
+
+## ALSO, YOU'LL NEED TO ENABLE cc_killfeed = 1 TO Base/Scripts/dedicated_autoconfig.gm
+
+# Assuming you're running Debian/Ubuntu, you'll need the following packages: #
+
+sudo apt-get install python-django nginx postgresql python-psycopg2 python-imaging python-flup screen
+
+# Now, copy the webserver and Database configurations over
+cd kag-linux32-dedicated/
+sudo cp frinkweb/etc/nginx/sites-available/frink.conf /etc/nginx/sites-available/frink.conf
+sudo ln -s /etc/nginx/sites-available/frink.conf /etc/nginx/sites-enabled/frink.conf
+
+# To setup the database:
+
+sudo su postgres
+psql
+CREATE DATABASE frinkstats;
+CREATE USER frink WITH PASSWORD 'frinkpassword';
+GRANT ALL PRIVILEGES ON DATABASE frinkstats TO frink;
+\q
+exit
+
+# fire up the web-app
+cd frinkweb/
+python ./manage.py sql stats
+python ./manage.py syncdb
+python ./manage.py runfcgi host=127.0.0.1 port=8080 maxrequests=1 maxchildren=4
+
+# reload the webserver
+sudo /etc/init.d/nginx reload
+
+# start the KAG server
+cd /home/frink/kag-linux32-dedicated/
+screen
+python
+from kagserv import *
+
+
+
+

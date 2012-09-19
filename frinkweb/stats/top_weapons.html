@@ -1,0 +1,151 @@
+{% extends "frink.html" %}
+
+
+{% block style %}
+	<style type="text/css">
+		#top_weapons {background-color:#900;}
+		.toplist {
+			display:inline-table;
+			margin-left:12px;
+			margin-right:12px;
+		}
+		#topsection {
+			background-color:#900;
+			width:95%;
+			display:inline-block;
+			padding-bottom:48px;
+
+		}
+	</style>
+{% endblock %}
+
+{% block content %}	
+			<div id="topsection">
+				<div class="toplist" id="hammer"><h1>Hammer</h1>
+					<table>
+						<thead>
+							<tr>
+								<th>Rank</th>
+								<th>Player</th>
+								<th>Kills</th>
+							
+							</tr>
+						</thead>
+						<tbody>
+						{% for player in hammer %}
+							<tr>
+								<td>{{forloop.counter}}</td>
+								<td><a href="/player/{{ player.name }}/{{timespan}}">{{player.name }}</a></td>
+								<td>{{player.kills}}</td>
+							</tr>
+						{% endfor %}
+						</tbody>
+					</table>
+				</div>
+				<div class="toplist" id="sword"><h1>Sword</h1>
+					<table>
+						<thead>
+							<tr>
+								<th>Rank</th>
+								<th>Player</th>
+								<th>Kills</th>
+							
+							</tr>
+						</thead>
+						<tbody>
+						{% for player in sword %}
+							<tr>
+								<td>{{forloop.counter}}</td>
+								<td><a href="/player/{{ player.name }}/{{timespan}}">{{player.name }}</a></td>
+								<td>{{player.kills}}</td>
+							</tr>
+						{% endfor %}
+						</tbody>
+					</table>
+				</div>
+				<div class="toplist" id="bow"><h1>Bow</h1>
+					<table>
+						<thead>
+							<tr>
+								<th>Rank</th>
+								<th>Player</th>
+								<th>Kills</th>
+							
+							</tr>
+						</thead>
+						<tbody>
+						{% for player in bow %}
+							<tr>
+								<td>{{forloop.counter}}</td>
+								<td><a href="/player/{{ player.name }}/{{timespan}}">{{player.name }}</a></td>
+								<td>{{player.kills}}</td>
+							</tr>
+						{% endfor %}
+						</tbody>
+					</table>
+				</div>
+				<div class="toplist" id="bomb"><h1>Bomb</h1>
+					<table>
+						<thead>
+							<tr>
+								<th>Rank</th>
+								<th>Player</th>
+								<th>Kills</th>
+							
+							</tr>
+						</thead>
+						<tbody>
+						{% for player in bomb %}
+							<tr>
+								<td>{{forloop.counter}}</td>
+								<td><a href="/player/{{ player.name }}/{{timespan}}">{{player.name }}</a></td>
+								<td>{{player.kills}}</td>
+							</tr>
+						{% endfor %}
+						</tbody>
+					</table>
+				</div>
+				<div class="toplist" id="catapult"><h1>Catapult</h1>
+					<table>
+						<thead>
+							<tr>
+								<th>Rank</th>
+								<th>Player</th>
+								<th>Kills</th>
+							
+							</tr>
+						</thead>
+						<tbody>
+						{% for player in catapult %}
+							<tr>
+								<td>{{forloop.counter}}</td>
+								<td><a href="/player/{{ player.name }}/{{timespan}}">{{player.name }}</a></td>
+								<td>{{player.kills}}</td>
+							</tr>
+						{% endfor %}
+						</tbody>
+					</table>
+				</div>
+				<div class="toplist" id="foot"><h1>Foot</h1>		
+					<table>
+						<thead>
+							<tr>
+								<th>Rank</th>
+								<th>Player</th>
+								<th>Kills</th>
+							
+							</tr>
+						</thead>
+						<tbody>
+						{% for player in foot %}
+							<tr>
+								<td>{{forloop.counter}}</td>
+								<td><a href="/player/{{ player.name }}/{{timespan}}">{{player.name }}</a></td>
+								<td>{{player.kills}}</td>
+							</tr>
+						{% endfor %}
+						</tbody>
+					</table>
+				</div>
+			</div>
+{% endblock %}
