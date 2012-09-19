@@ -1,11 +1,30 @@
 
+## To Restart the Web Server after a modification:
 
-To Restart the Web Server after a modification:
+frink@arena:~/kag-linux32-dedicated/frinkweb$ sh webkill.sh
+frink@arena:~/kag-linux32-dedicated/frinkweb$ sh webstart.sh
 
-To flush the Web cache:
+## To flush the database if the stats need to be rebuilt:
 
-To flush the database:
+frink@arena:~/kag-linux32-dedicated/frinkweb$ python ./manage.py flush
 
-To Manually Build The Database:
+## To Manually Build The Database:
 
-To Administer the Server:
+frink@arena:~/kag-linux32-dedicated/frinkweb$ python
+>>> from logparser import *
+>>> lp = LogParser()
+>>> lp.parse_logs()
+
+## To Start/Administer the KAG Server:
+
+frink@arena:~/kag-linux32-dedicated$ screen
+frink@arena:~/kag-linux32-dedicated$ python
+>>> from kagserver import *		# This starts the management script and KAG server
+# You'll see KAG start up now, there are some interactive commands you can use like
+>>> K.state()
+Players:17 Uptime:3.6h Mem:62.0m Restarts:0  # You'll get a result like this
+>>> K.dblock = True			# This stops the stats DB from being updated
+>>> K.dblock = False			# This reactivates the stats updates
+>>> K.restart_server()			# Restart the server for whatever reason
+
+
