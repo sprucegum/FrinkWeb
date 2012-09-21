@@ -1,0 +1,41 @@
+Console Log Parsing
+	Identify Play Sessions
+		Lives
+			Kill Streaks
+			Multi Kills
+		Calculate Play Time
+			Kills/Hour
+			Plot K/D over Time
+		
+	Realtime Player Count
+		Write to DB
+
+Player Search on Web Page
+	Pop up names using AJAX
+
+Add more information to player page
+	Add link to forum profile?
+	get player # from avatar url
+		link to https://forum.kag2d.com/members/playername.XXXX/
+
+Per Weapon Rank tables in database to improve speed
+Use API on the backend to query gold status, forum urls
+
+
+Write server state to database
+	Graph Players, kills, deaths, admin presence
+
+SSO Login
+	Parse Security Configs to identify admins
+		Write admin actions to database
+		
+	Write chats to database
+		Make chats searchable
+
+Add a Blue CSS style 
+
+Optimize DB access and Page Generation
+
+Compress Old Logs
+
+Installer
