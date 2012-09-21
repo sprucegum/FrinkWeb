@@ -21,9 +21,6 @@ Copyright (C) 2012  Jade Lacosse
 ##	Interactive way
 ##		python
 ##		>> from kagserv import *
-##	Recommended Interactive way
-##		ipython
-##		In [0]: from kagserv import *
 ##
 ## Please send any significant changes to sprucegum@gmail.com
 
