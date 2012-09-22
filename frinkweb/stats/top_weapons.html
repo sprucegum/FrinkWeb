@@ -20,28 +20,32 @@
 {% endblock %}
 
 {% block content %}	
-			<div id="topsection">
-				<div class="toplist" id="hammer"><h1>Hammer</h1>
-					<table>
-						<thead>
-							<tr>
-								<th>Rank</th>
-								<th>Player</th>
-								<th>Kills</th>
-							
-							</tr>
-						</thead>
-						<tbody>
-						{% for player in hammer %}
-							<tr>
-								<td>{{forloop.counter}}</td>
-								<td><a href="/player/{{ player.name }}/{{timespan}}">{{player.name }}</a></td>
-								<td>{{player.kills}}</td>
-							</tr>
-						{% endfor %}
-						</tbody>
-					</table>
-				</div>
+		
+				<div id="topsection">
+					{% if hammer %}
+					<div class="toplist" id="hammer"><h1>Hammer</h1>
+						<table>
+							<thead>
+								<tr>
+									<th>Rank</th>
+									<th>Player</th>
+									<th>Kills</th>
+								
+								</tr>
+							</thead>
+							<tbody>
+							{% for player in hammer %}
+								<tr>
+									<td>{{forloop.counter}}</td>
+									<td><a href="/player/{{ player.name }}/{{timespan}}">{{player.name }}</a></td>
+									<td>{{player.kills}}</td>
+								</tr>
+							{% endfor %}
+							</tbody>
+						</table>
+					</div>
+				{% endif %}
+				{% if sword %}
 				<div class="toplist" id="sword"><h1>Sword</h1>
 					<table>
 						<thead>
@@ -63,6 +67,8 @@
 						</tbody>
 					</table>
 				</div>
+				{% endif %}
+				{% if bow %}
 				<div class="toplist" id="bow"><h1>Bow</h1>
 					<table>
 						<thead>
@@ -84,6 +90,8 @@
 						</tbody>
 					</table>
 				</div>
+				{% endif %}
+				{% if bomb %}
 				<div class="toplist" id="bomb"><h1>Bomb</h1>
 					<table>
 						<thead>
@@ -105,6 +113,8 @@
 						</tbody>
 					</table>
 				</div>
+				{% endif %}
+				{% if catapult %}
 				<div class="toplist" id="catapult"><h1>Catapult</h1>
 					<table>
 						<thead>
@@ -126,6 +136,8 @@
 						</tbody>
 					</table>
 				</div>
+				{% endif %}
+				{% if foot %}
 				<div class="toplist" id="foot"><h1>Foot</h1>		
 					<table>
 						<thead>
@@ -147,5 +159,6 @@
 						</tbody>
 					</table>
 				</div>
+				{% endif %}
 			</div>
 {% endblock %}
