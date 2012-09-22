@@ -32,6 +32,20 @@ SSO Login
 		
 	Write chats to database
 		Make chats searchable
+		
+	Customizable player pages
+	
+Banner Legend
+	Kill Streak Banner
+		Crystal Skull = 50 kills
+		Jade Skull = 25 kills
+		Gold skull = 10 kills
+		Silver skull = 5 kills
+		Bone skull = 1 kill
+	MultiKill Banner Element
+		Gold Bomb = 10 kills
+		Silver Bomb = 5 kills
+		Bomb = 1 kill
 
 Add a Blue CSS style 
 
@@ -40,3 +54,8 @@ Optimize DB access and Page Generation
 Compress Old Logs
 
 Installer
+
+Multi-Server Statistics
+	Add Server Model to Database
+		Assign Server->Kill,Death, Session relationships
+	create FTP log fetcher
