@@ -26,6 +26,9 @@ Write server state to database
 	Graph Players, kills, deaths, admin presence
 
 SSO Login
+	Map Submission
+		Map voting
+
 	Parse Security Configs to identify admins
 		Write admin actions to database
 		
