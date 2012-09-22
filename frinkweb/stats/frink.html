@@ -20,6 +20,7 @@
 		<script>
 			$(document).ready(function() {$('a').click(function(){
 				fadein();
+				$('#psearchdiv').animate({'opacity':0},200);
 			});});
 			function fadein(){
 				$('#loading').animate({'opacity':1.0},1000,function(){fadeout()})
@@ -70,8 +71,7 @@
 			#psearchdiv{
 				position:absolute;
 				left:16px;
-				top:44px;
-				
+				top:16px;
 				width: 143px;
 				text-align:left;
 			}
