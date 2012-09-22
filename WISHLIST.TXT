@@ -28,7 +28,10 @@ SSO Login
 		Map voting
 
 	Parse Security Configs to identify admins
-		Write admin actions to database
+		Provide Server Control Interface to Admins
+		Provide Text Editor Interface for configuration files
+			Provide GIT revision control for server configuration
+		Write RCON actions to database
 		
 	Write chats to database
 		Make chats searchable
@@ -47,7 +50,8 @@ Banner Legend
 		Silver Bomb = 5 kills
 		Bomb = 1 kill
 
-Add a Blue CSS style 
+Refactor Style, Minimal CSS in HTML files.
+	Add a Blue CSS style 
 
 Optimize DB access and Page Generation
 
@@ -59,3 +63,6 @@ Multi-Server Statistics
 	Add Server Model to Database
 		Assign Server->Kill,Death, Session relationships
 	create FTP log fetcher
+	
+Server Side RCON
+	Web RCON
