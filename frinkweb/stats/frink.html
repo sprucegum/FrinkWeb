@@ -5,14 +5,16 @@
 		<LINK href="/static/frinkstyle_red.3.css" rel="stylesheet" type="text/css">
 		<script type="text/javascript" src="/static/jquery-1.8.0.min.js"></script> 
 		<script type="text/javascript" src="/static/jquery.tablesorter.min.js"></script> 
-
+		<script type="text/javascript" src="/static/jquery-ui-1.8.23.custom.min.js"></script> 
+		
 		{% block javascript %}
 		<script>
-			$(document).ready(function() 
-			    { 
-				$("table").tablesorter(); 
-			    } 
-			);
+			$(document).ready(function(){ 
+					$("table").tablesorter(); 
+					
+			});
+			
+
 		</script>
 		{% endblock %}
 		<script>
@@ -25,7 +27,19 @@
 			function fadeout(){
 				$('#loading').animate({'opacity':0},1000,function(){fadein()})
 			};
-
+			function gotoplayer( player ) {
+				location.href = "/player/"+player;
+			};
+			$(function() {
+				$("#psearch").autocomplete({
+					source: '/playersearch',
+					minLength: 1,
+					select: function( event, ui ) {
+						gotoplayer( ui.item.value);
+					},
+					appendTo:"#psearchdiv"
+				});
+			});
 		</script>
 		{% block style %}
 		{% endblock %}
@@ -53,12 +67,41 @@
 			.seo {
 				display:none;
 			}
+			#psearchdiv{
+				position:fixed;
+				left:16px;
+				top:44px;
+				background-color:#700;
+				width: 143px;
+				text-align:left;
+			}
+			input {
+				border:none;
+				font-family: eightbit;
+				background-color:#600;
+				color:#FFF;
+				font-size:24px;
+				width: 143px;
+			}
+			ul {
+				font-size:24px;
+				list-style-type: none;
+				text-shadow:none;
+				padding: 0px;
+				margin: 0px;
+				cursor: pointer;
+			}
 		</style>
 		<TITLE>Dr.Frink's Stats</TITLE>
 	</HEAD>
 	<div id="about" class="seo">A King Arthur's Gold Server, maintained by Jade Lacosse AKA "Dr.Frink".</div>
-	<BODY>	
+	<BODY>
 		<div id="main">
+			<div id="psearchdiv">
+				<div class="ui-widget"><input id="psearch" name="psearch"></div>
+				<div id="playernames"></div>
+			</div>
+
 			<div id="loading">LOADING</div>
 			<div id="timespans">
 				<a href="{{prefix}}hourly"><div id="hourly" class="timespan">H</div></a>

@@ -10,9 +10,6 @@ Console Log Parsing
 	Realtime Player Count
 		Write to DB
 
-Player Search on Web Page
-	Pop up names using AJAX
-
 Add more information to player page
 	Add link to forum profile?
 	get player # from avatar url

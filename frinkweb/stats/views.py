@@ -23,6 +23,7 @@ from datetime import datetime, timedelta
 from banner import Banner
 from django.http import HttpResponse
 from blacklist import *
+import json
 
 def get_timespan(timespan):
 	tspan = datetime.now()
@@ -89,6 +90,14 @@ def top_clans(request,timespan=''):
 			top_clans = tc
 			
 	return render_to_response('top_clans.html', {'top_clans': top_clans, 'timespan':timespan,'count':len(top_clans)})
+
+def player_search(request):
+	if request.GET.__contains__("term"):
+		name = request.GET["term"]
+	
+	players = Player.objects.filter(name__startswith=name).values("name")[:10]
+	plist = [player["name"] for player in players]
+	return HttpResponse(json.dumps(plist), mimetype="application/json")
 
 def blacklist(request):
 	b = BlackList()
