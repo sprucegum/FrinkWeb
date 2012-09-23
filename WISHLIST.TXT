@@ -57,7 +57,21 @@ Optimize DB access and Page Generation
 
 Compress Old Logs
 
+Get KAG PID from pid.txt instead of ps
+	Then we know we're attaching to the right process
+		Then we can run multiple servers on the same machine
+
 Installer
+	Find all Magic Values, Hard-Coding, configure automagically
+		Install to current directory, or ask user for install directory
+		ask user for DNS name
+		Ask for Server Name, Owner
+		create database password, randomize token
+		Install nginx, postgres
+			copy configurations
+		turn on cc_killfeed
+		Try firing up everything		
+				
 
 Multi-Server Statistics
 	Add Server Model to Database
