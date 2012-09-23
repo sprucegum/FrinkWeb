@@ -34,7 +34,7 @@ exit
 cd frinkweb/
 python ./manage.py sql stats
 python ./manage.py syncdb
-python ./manage.py runfcgi host=127.0.0.1 port=8080 maxrequests=1 maxchildren=4
+sh webstart.sh
 
 # reload the webserver
 sudo /etc/init.d/nginx reload
