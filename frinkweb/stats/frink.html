@@ -18,20 +18,11 @@
 		</script>
 		{% endblock %}
 		<script>
-			$(document).ready(function() {$('a').click(function(){
-				fadein();
-				$('#psearchdiv').animate({'opacity':0},200);
-			});});
-			function fadein(){
-				$('#loading').animate({'opacity':1.0},1000,function(){fadeout()})
-			};
-			function fadeout(){
-				$('#loading').animate({'opacity':0},1000,function(){fadein()})
-			};
-			function gotoplayer( player ) {
-				location.href = "/player/"+player;
-			};
-			$(function() {
+			$(document).ready(function() {
+				$('a').click(function(){
+					fadein();
+					$('#psearchdiv').animate({'opacity':0},200);
+				});
 				$("#psearch").autocomplete({
 					source: '/playersearch',
 					minLength: 1,
@@ -41,6 +32,16 @@
 					appendTo:"#psearchdiv"
 				});
 			});
+			function fadein(){
+				$('#loading').animate({'opacity':1.0},1000,function(){fadeout()})
+			};
+			function fadeout(){
+				$('#loading').animate({'opacity':0},1000,function(){fadein()})
+			};
+			function gotoplayer( player ) {
+				location.href = "/player/"+player;
+			};
+
 		</script>
 		{% block style %}
 		{% endblock %}
@@ -69,7 +70,7 @@
 				display:none;
 			}
 			#psearchdiv{
-				position:absolute;
+				position:fixed;
 				left:16px;
 				top:16px;
 				width: 143px;
