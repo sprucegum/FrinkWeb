@@ -1,4 +1,6 @@
 Console Log Parsing
+	Restart Server if the log says something like:
+		"[18:29:23] WARNING: API call failed: serverPort or serverAddress not present for putStatus()"
 	Identify Play Sessions
 		Lives
 			Kill Streaks
@@ -10,12 +12,16 @@ Console Log Parsing
 	Realtime Player Count
 		Write to DB
 
+Handle Weird clan names
+	html encode everything all links, since firefox doesn't trust my webserver.
+
 Add more information to player page
 	Add link to forum profile?
 	get player # from avatar url
 		link to https://forum.kag2d.com/members/playername.XXXX/
 
 Per Weapon Rank tables in database to improve speed
+
 Use API on the backend to query gold status, forum urls (instead of doing it through AJAX)
 	Remove KAG API Proxy
 
