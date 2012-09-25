@@ -19,7 +19,7 @@ import Image, ImageColor, ImageDraw, ImageFont
 
 
 KAG_DIR = '/home/frink/kag-linux32-dedicated/'
-WATERMARK = "frink.gnudist.com"
+WATERMARK = "arena.gnudist.com"
 
 class Banner(object):
 	def __init__(self,name="Teste Mctesterton",kills=4432,wkills=53,dkills=14, deaths=1):
@@ -49,6 +49,7 @@ class Banner(object):
 		draw.text((width-(fw+14),height-16),WATERMARK,font=yoster12,fill=(136,0,0))
 				
 		# Load medal images
+		m10k = Image.open(KAG_DIR + "/frinkweb/originals/10k.png")
 		m5k = Image.open(KAG_DIR + "frinkweb/originals/5k.png")
 		m1k = Image.open(KAG_DIR + "frinkweb/originals/1k.png")
 		m500 = Image.open(KAG_DIR + "frinkweb/originals/500.png")
@@ -62,7 +63,11 @@ class Banner(object):
 		draw.text((xpos,ypos-14),"All-Time Kills",font=yoster12)
 		okills = kills
 		while kills >= 10:
-			if kills >= 5000:
+			if kills >= 10000:
+				self.image.paste(m10k, (xpos, ypos),m10k)
+				kills -= 10000
+				xpos += 10
+			elif kills >= 5000:
 				self.image.paste(m5k, (xpos, ypos),m5k)
 				kills -= 5000
 				
