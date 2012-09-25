@@ -1,7 +1,8 @@
 import json
+KAG_DIR = '/home/frink/kag-linux32-dedicated/'
 class BlackList(object):
 	def __init__(self):
-		banfile = open('/home/jadel/kag_linux/Base/Security/blacklist.cfg')
+		banfile = open(KAG_DIR + '/Base/Security/blacklist.cfg')
 		bf = banfile.readlines()
 		liststart = bf.index('blacklist =\n')
 		self.bantext = [line.strip() for line in bf[(liststart+1):]]

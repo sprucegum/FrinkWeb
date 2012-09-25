@@ -23,6 +23,7 @@ import re
 import settings
 from stats.models import *
 import datetime
+from serverstate import *
 
 KAG_DIR = '/home/frink/kag-linux32-dedicated/'
 
@@ -78,9 +79,9 @@ class LogParser(object):
 		chats.sort()
 		return (chats)
 
-	def parse_livelog(self,seek=0, lasthour=0, days=0):
-		self.lasthour = lasthour
-		self.days = days
+	def parse_livelog(ss):
+		self.lasthour = ss.lasthour
+		self.days = ss.days
 		if self.livelog is None:
 			self.livelogname = self.get_logs()[-1]
 			self.livelog = open(KAG_DIR + 'Logs/' + self.livelogname)
@@ -88,7 +89,7 @@ class LogParser(object):
 		new_events = self.livelog.readlines()[seek:]
 		self.parse_log(new_events)
 		self.process_database()
-		return (seek+len(new_events),self.lasthour,self.days)
+		ss.logposition = seek+len(new_events)
 		
 
 

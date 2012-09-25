@@ -27,7 +27,7 @@ class Player(models.Model):
 	deaths = models.IntegerField(default=0)
 	kd = models.DecimalField(decimal_places=2,max_digits=5,default="0.0")
 	play_time = models.IntegerField(default=0)
-
+	gold = models.BooleanField(default=False)
 	def add_kill(self):
 		self.kills += 1
 		self.save()
@@ -48,6 +48,14 @@ class Player(models.Model):
 
 	def __unicode__(self):
 		return self.name
+		
+class Avatar(models.Model):
+	player = models.ForeignKey(Player)
+	small = models.URLField()
+	medium = models.URLField()
+	large = models.URLField()
+	def __unicode__(self):
+		return self.player
 
 class Kill(models.Model):
 	player = models.ForeignKey(Player, related_name = 'kill_set')
@@ -101,17 +109,37 @@ class Cause(models.Model):
 	name = models.CharField(max_length=50)
 	def __unicode__(self):
 		return self.name
-
-class Session(models.Model):
+		
+class TopCategory(models.Model):
+	name = models.CharField(max_length=80)
+	def __unicode__(self):
+		return self.name
+		
+class TopTable(models.Model):
+	category = models.ForeignKey(TopCategory)
+	def __unicode__(self):
+		return self.category
+		
+class TopEntry(models.Model):
 	player = models.ForeignKey(Player)
-	start = models.DateTimeField()
-	end = models.DateTimeField()
-	kills = models.IntegerField(default=0)
-	deaths = models.IntegerField(default=0)
-	kd = models.DecimalField(decimal_places=2,max_digits=5,default="0.0")
+	rank = models.IntegerField(default=0)
+	table = models.ForeignKey(TopTable)
 	def __unicode__(self):
 		return self.player
+		
 
+		
+
+
+class GameRound(models.Model):
+	start = models.DateTimeField()
+	end = models.DateTimeField()
+	gamemap = models.CharField(max_length=255)
+	kills = models.IntegerField(default=0)
+	deaths = models.IntegerField(default=0)
+	def __unicode__(self):
+		return self.gamemap
+		
 class Life(models.Model):
 	player = models.ForeignKey(Player)
 	kill_set = models.ManyToManyField(Kill)
@@ -119,8 +147,38 @@ class Life(models.Model):
 	end = models.DateTimeField()
 	def __unicode__(self):
 		return self.player
+		
+class Session(models.Model):
+	player = models.ForeignKey(Player)
+	start = models.DateTimeField()
+	end = models.DateTimeField()
+	kills = models.IntegerField(default=0)
+	deaths = models.IntegerField(default=0)
+	kd = models.DecimalField(decimal_places=2,max_digits=5,default="0.0")
+	life_set = models.ManyToManyField(Life)
+	def __unicode__(self):
+		return self.player
 
 
+
+class MultiKill(models.Model):
+	player = models.ForeignKey(Player)
+	victims = models.ManyToManyField(Player, related_name = 'multivictim_set')
+	kill_set = models.ManyToManyField(Kill, related_name = 'multikill')
+	count = models.IntegerField(default=0)
+	life = models.ForeignKey(Life)
+	def __unicode__(self):
+		return self.player
+	
+class KillingSpree(models.Model):
+	player = models.ForeignKey(Player)
+	victims = models.ManyToManyField(Player, related_name = 'spreevictim_set')
+	kill_set = models.ManyToManyField(Kill, related_name = 'spree')
+	count = models.IntegerField(default=0)
+	life= models.ForeignKey(Life)
+	def __unicode__(self):
+		return self.player
+	
 class Chat(models.Model):
 	player = models.ForeignKey(Player)
 	time = models.DateTimeField()
@@ -130,6 +188,7 @@ class Chat(models.Model):
 
 class ServerState(models.Model):
 	players = models.IntegerField(default=0)
+	player_set = models.ManyToManyField(Player, related_name = 'serverstate_set')
 	mem = models.IntegerField(default=0)
 	time = models.DateTimeField()
 	uptime = models.IntegerField(default=0)

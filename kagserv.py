@@ -26,6 +26,7 @@ Copyright (C) 2012  Jade Lacosse
 
 from subprocess import Popen, PIPE, call
 from time import time
+from datetime import datetime
 from threading import Timer
 from os import getcwd, walk
 from sys import exit, path
@@ -40,6 +41,7 @@ KAG_DIR = '/home/frink/kag-linux32-dedicated/'
 path.append('frinkweb')
 
 from frinkweb.logparser import *
+from frinkweb.serverstate import *
 ## Settings:
 
 MEMLIMIT = 200 		# megabytes, restart the server even if occupied if it hits this RAM limit.
@@ -50,6 +52,7 @@ STATS_PERIOD = 1	# minutes, how often to update stats.
 
 class KagServer(object):
 	def __init__(self):
+		self.ss = ServerState()
 		self.sPID = self.getPID()
 		if (self.sPID == -1):
 			self.KAG = self.start_server()
@@ -57,12 +60,7 @@ class KagServer(object):
 			self.KAG = self.attach_server()
 		self.run_manager = True
 		self.timer = None
-		self.restarts = 0
-		self.memrestarts = 0
-		self.updates = 0
-		self.logposition = 0
-		self.lasthour = 0
-		self.days = 0
+		
 		self.dblock = False
 		self.last_stats_update = time()
 
@@ -71,12 +69,12 @@ class KagServer(object):
 			return int(stats.read().split()[3])
 
 	def start_server(self):
-		self.start_time = time() 
+		self.ss.start_time = datetime.now() 
 		self.run_manager = True
 		self.fresh = True
-		self.logposition = 0
-		self.days = 0
-		self.last_update_check = time() - UPDATE_PERIOD*60
+		self.ss.logposition = 0
+		self.ss.days = 0
+		self.last_update_check = time()
 		self.last_stats_update = time()
 		
 		return Popen(['{0}KAGdedi'.format(KAG_DIR), \
@@ -84,7 +82,7 @@ class KagServer(object):
 		'{0}autoconfig Scripts/dedicated_autoconfig.gm'.format(KAG_DIR)])
 
 	def attach_server(self):
-		self.start_time = time() - RESTART_PERIOD*60
+		self.ss.start_time = time() - RESTART_PERIOD*60
 		self.run_manager = True
 		self.fresh = False 
 		self.last_update_check = time() - UPDATE_PERIOD*60
@@ -105,7 +103,7 @@ class KagServer(object):
 
 	def getPID(self):
 		try:
-                	return int(Popen(["ps","-C","KAGdedi","-o","pid"],stdout=PIPE).stdout.read().split()[1])
+			return int(Popen(["ps","-C","KAGdedi","-o","pid"],stdout=PIPE).stdout.read().split()[1])
 		except:
 			return -1
 
@@ -116,7 +114,7 @@ class KagServer(object):
 	
 	def restart_server(self):
 		self.rotate_map()
-		self.restarts += 1
+		self.ss.restarts += 1
 		lp = self.parse_live()
 		if lp:
 			lp.close_livelog()
@@ -137,8 +135,7 @@ class KagServer(object):
 			self.dblock = True
 			lp = LogParser()
 			self.last_stats_update = time()
-			self.logposition, self.lasthour, self.days = lp.parse_livelog(self.logposition, self.lasthour, self.days)
-		
+			lp.parse_livelog(ss)
 			print("processing database")
 			lp.process_database()
 			print("database processed")
@@ -149,7 +146,7 @@ class KagServer(object):
 	
 
 	def get_uptime(self):
-		return (time() - self.start_time)
+		return (time() - self.ss.start_time)
 
 	def running(self):
 		self.KAG.poll()
@@ -169,7 +166,7 @@ class KagServer(object):
 					self.KAG = self.start_server()
 				
 				elif (self.get_mem()> memory_limit):
-					self.memrestarts += 1
+					self.ss.memrestarts += 1
 					self.restart_server()
 				elif ((players > 0) and self.fresh):
 					self.fresh = False
@@ -181,7 +178,7 @@ class KagServer(object):
 					if (players == 0):
 						print("Checking for Update")
 						if self.check_update():
-							self.updates += 1
+							self.ss.updates += 1
 							self.restart_server()
 							
 				if (((time() - self.last_stats_update)>(STATS_PERIOD*60)) and (players>0)):
@@ -220,7 +217,7 @@ class ProxyProcess(object):
 	def poll(self):
 		try:
 			self.pid = int(Popen(["ps","-C","KAGdedi","-o","pid"],stdout=PIPE).stdout.read().split()[1])
-                	return None
+			return None
 		except:
 			return 0
 
