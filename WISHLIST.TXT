@@ -83,6 +83,16 @@ Multi-Server Statistics
 	Add Server Model to Database
 		Assign Server->Kill,Death, Session relationships
 	create FTP log fetcher
+	Create a multi-server management script
 	
 Server Side RCON
 	Web RCON
+
+Automated Video Capture
+	Keep a 10 minute buffer of video
+		save crop and archive "interesting events"
+			link events to videos on frinkweb
+
+Blacklist Network
+	Query a list of trusted servers
+		Synchronize bans
