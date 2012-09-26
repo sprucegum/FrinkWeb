@@ -133,9 +133,9 @@ class KagServer(object):
 		if not self.dblock:
 			print("updating database")
 			self.dblock = True
-			lp = LogParser()
+			lp = LogParser(self.ss)
 			self.last_stats_update = time()
-			lp.parse_livelog(ss)
+			lp.parse_livelog()
 			print("processing database")
 			lp.process_database()
 			print("database processed")

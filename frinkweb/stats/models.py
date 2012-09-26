@@ -19,8 +19,22 @@ from django.db import models
 
 # Create your models here.
 
+class IP(models.Model):
+	address = models.IPAddressField()
+	date = models.DateTimeField()
+	def __unicode__(self):
+		return self.address
+
+class RCONEvent(models.Model):
+	admin = models.ForeignKey(Player)
+	action = models.CharField(max_length=255)
+	date = models.DateTimeField()
+	def __unicode__(self):
+			return self.action
+
 class Player(models.Model):
 	name = models.CharField(max_length=50)
+	ip_set = models.ManyToManyField(IP)
 	printedname = models.CharField(max_length=60)
 	clan = models.ForeignKey("Clan")
 	kills = models.IntegerField(default=0)
@@ -28,6 +42,9 @@ class Player(models.Model):
 	kd = models.DecimalField(decimal_places=2,max_digits=5,default="0.0")
 	play_time = models.IntegerField(default=0)
 	gold = models.BooleanField(default=False)
+	admin = models.BooleanField(default=False)
+	jradmin = models.BooleanField(default=False)
+		
 	def add_kill(self):
 		self.kills += 1
 		self.save()
@@ -48,7 +65,8 @@ class Player(models.Model):
 
 	def __unicode__(self):
 		return self.name
-		
+
+	
 class Avatar(models.Model):
 	player = models.ForeignKey(Player)
 	small = models.URLField()
@@ -158,8 +176,6 @@ class Session(models.Model):
 	life_set = models.ManyToManyField(Life)
 	def __unicode__(self):
 		return self.player
-
-
 
 class MultiKill(models.Model):
 	player = models.ForeignKey(Player)

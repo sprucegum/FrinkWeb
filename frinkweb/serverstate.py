@@ -14,6 +14,10 @@ class ServerState(object):
 		memusage = 0
 		current_map = ""
 		start_time = None
+		players = {}
+		clans = {}
+		weapons = {}
+		causes = {}
 		def __init__(self):
 			self.birth = datetime.now()
 			

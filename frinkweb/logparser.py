@@ -22,7 +22,7 @@ from shutil import move
 import re
 import settings
 from stats.models import *
-import datetime
+from datetime import datetime, timedelta
 from serverstate import *
 
 KAG_DIR = '/home/frink/kag-linux32-dedicated/'
@@ -30,16 +30,10 @@ KAG_DIR = '/home/frink/kag-linux32-dedicated/'
 PRINT_DEBUG = False
 
 class LogParser(object):
-	
-	def __init__(self):
+	def __init__(self, ss = ServerState()):	
+		self.ss = ss
 		self.freshlog = True
 		self.livelog = None
-		self.players = {}
-		self.clans = {}
-		self.weapons = {}
-		self.causes = {}
-		self.lasthour = 0
-		self.days = 0
 
 		
 	def parse_logs(self):
@@ -54,8 +48,8 @@ class LogParser(object):
 			self.set_day(chat)
 			logfile = open(KAG_DIR +'Logs/'+chat)
 			log = logfile.readlines()
-			self.lasthour = 0
-			self.days = 0
+			self.ss.lasthour = 0
+			self.ss.days = 0
 			self.unparsed = self.parse_log(log)
 			self.move_log(logfile,chat)
 			
@@ -79,9 +73,7 @@ class LogParser(object):
 		chats.sort()
 		return (chats)
 
-	def parse_livelog(ss):
-		self.lasthour = ss.lasthour
-		self.days = ss.days
+	def parse_livelog(self):
 		if self.livelog is None:
 			self.livelogname = self.get_logs()[-1]
 			self.livelog = open(KAG_DIR + 'Logs/' + self.livelogname)
@@ -89,7 +81,7 @@ class LogParser(object):
 		new_events = self.livelog.readlines()[seek:]
 		self.parse_log(new_events)
 		self.process_database()
-		ss.logposition = seek+len(new_events)
+		self.ss.logposition = seek+len(new_events)
 		
 
 
@@ -261,16 +253,16 @@ class LogParser(object):
 	def parse_time(self,logtime):
 
 		(hour, minute, second) = logtime.strip('[]').split(':')
-		if int(hour) < self.lasthour:
-			self.days += 1
-			print "incrementing day. days:{0} hour:{1} lasthour:{2} logtime:{3}".format(self.days, hour, self.lasthour, logtime)
-		self.lasthour = int(hour)
-		return (datetime.datetime(int(self.year),
+		if int(hour) < self.ss.lasthour:
+			self.ss.days += 1
+			print "incrementing day. days:{0} hour:{1} lasthour:{2} logtime:{3}".format(self.ss.days, hour, self.ss.lasthour, logtime)
+		self.ss.lasthour = int(hour)
+		return (datetime(int(self.year),
 					int(self.month), 
 					int(self.day),
 					int(hour),
 					int(minute),
-					int(second))+datetime.timedelta(days=self.days))
+					int(second))+timedelta(days=self.ss.days))
 	
 	def add_kills(self,kills):
 		
@@ -311,45 +303,45 @@ class LogParser(object):
 					
 	def get_player(self,pname):
 		pname = pname.decode('utf-8','ignore')
-		if pname in self.players:
-			return self.players[pname]
+		if pname in self.ss.players:
+			return self.ss.players[pname]
 		else:
 			try:
 				p = Player.objects.get(name=pname)
-				self.players[pname] = p
+				self.ss.players[pname] = p
 				return p
 			except:
 				try:
 					p = Player.objects.get(printedname=pname)
-					self.players[pname] = p
+					self.ss.players[pname] = p
 					return p
 				except:
 					p = Player(name=pname,clan=self.get_clan('NoClan'))
-					self.players[pname] = p
+					self.ss.players[pname] = p
 					return p
 
 	def get_clan(self,cname):
-		if cname.decode('utf-8','ignore') in self.clans:
-			return self.clans[cname.decode('utf-8','ignore')]
+		if cname.decode('utf-8','ignore') in self.ss.clans:
+			return self.ss.clans[cname.decode('utf-8','ignore')]
 		else:
 			c, g = Clan.objects.get_or_create(name=cname.decode('utf-8','ignore'))
-			self.clans[cname.decode('utf-8','ignore')] = c
+			self.ss.clans[cname.decode('utf-8','ignore')] = c
 			return c
 
 	def get_weapon(self,wname):
-		if wname in self.weapons:
-			return self.weapons[wname]
+		if wname in self.ss.weapons:
+			return self.ss.weapons[wname]
 		else:
 			w, g = Weapon.objects.get_or_create(name = wname)
-			self.weapons[wname] = w
+			self.ss.weapons[wname] = w
 			return w
 
 	def get_cause(self,cname):
-		if cname in self.causes:
-			return self.causes[cname]
+		if cname in self.ss.causes:
+			return self.ss.causes[cname]
 		else:
 			c, created = Cause.objects.get_or_create(name = cname)
-			self.causes[cname] = c
+			self.ss.causes[cname] = c
 			return c
 
 	def add_players(self,players):
@@ -381,12 +373,12 @@ class LogParser(object):
 		clan.save()
 
 	def calculate_kds(self):
-		for pname,player in self.players.iteritems():
+		for pname,player in self.ss.players.iteritems():
 			player.update_kd()
 
-		for cname,clan in self.clans.iteritems():
+		for cname,clan in self.ss.clans.iteritems():
 			clan.update_kd()
 
 	def count_clanmembers(self):
-		for cname, clan in self.clans.iteritems():
+		for cname, clan in self.ss.clans.iteritems():
 			clan.update_members()
