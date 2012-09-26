@@ -22,14 +22,14 @@ KAG_DIR = '/home/frink/kag-linux32-dedicated/'
 WATERMARK = "arena.gnudist.com"
 
 class Banner(object):
-	def __init__(self,name="Teste Mctesterton",kills=4432,wkills=53,dkills=14, deaths=1):
+	def __init__(self,name="Teste Mctesterton",kills=6432,wkills=534,dkills=140, deaths=1):
 		name = name.replace('_',' ')
 		# Make Fonts
 		yoster24 = ImageFont.truetype(KAG_DIR + 'frinkweb/stats/static/yoster.ttf',24)
 		yoster12 = ImageFont.truetype(KAG_DIR + 'frinkweb/stats/static/yoster.ttf',12)
 		# Make Canvas
-		width = 400
-		height = 80
+		width = 600
+		height = 50
 		self.image = Image.new("RGBA",(width,height),(0,0,0,0))
 		draw = ImageDraw.Draw(self.image)
 		# Draw Border
@@ -46,8 +46,9 @@ class Banner(object):
 		
 		fw, fh = yoster12.getsize(WATERMARK)
 		#draw.text((14,height-16),"Dr. Frink's FUNHOUSE",font=yoster12,fill=(136,0,0))
-		draw.text((width-(fw+14),height-16),WATERMARK,font=yoster12,fill=(136,0,0))
-				
+		#draw.text((width-(fw+14),height-16),WATERMARK,font=yoster12,fill=(136,0,0))
+		draw.text(((width/2)-(fw/2),height-16),WATERMARK,font=yoster12,fill=(136,0,0))
+		
 		# Load medal images
 		m10k = Image.open(KAG_DIR + "/frinkweb/originals/10k.png")
 		m5k = Image.open(KAG_DIR + "frinkweb/originals/5k.png")
@@ -59,8 +60,8 @@ class Banner(object):
 		
 		# Draw Medals
 		xpos = 16
-		ypos = height - 36
-		draw.text((xpos,ypos-14),"All-Time Kills",font=yoster12)
+		ypos = height - 30
+		draw.text((xpos,ypos-12),"All-Time",font=yoster12)
 		okills = kills
 		while kills >= 10:
 			if kills >= 10000:
@@ -93,8 +94,8 @@ class Banner(object):
 			xpos += 11
 		spacehint = xpos
 		if wkills >= 10:	
-			xpos = max(yoster12.getsize("All-Time Kills")[0] + 16, xpos) + 12
-			draw.text((xpos,ypos-14),"This Week",font=yoster12)
+			xpos = max(yoster12.getsize("All-Time")[0] + 16, xpos) + 12
+			draw.text((xpos,ypos-12),"Weekly",font=yoster12)
 			spacehint = xpos
 			while wkills > 9:
 				if wkills >= 5000:
@@ -118,8 +119,8 @@ class Banner(object):
 				xpos += 11
 				
 		if dkills >= 10:
-			xpos = max(yoster12.getsize("This Week")[0] + spacehint, xpos) + 12
-			draw.text((xpos,ypos-14),"Today",font=yoster12)
+			xpos = max(yoster12.getsize("Weekly")[0] + spacehint, xpos) + 12
+			draw.text((xpos,ypos-12),"Today",font=yoster12)
 			while dkills > 9:
 				if dkills >= 5000:
 					self.image.paste(m5k, (xpos, ypos),m5k)
@@ -146,7 +147,7 @@ class Banner(object):
 			kd = okills/float(deaths)
 			star = Image.open(KAG_DIR + "frinkweb/originals/star.png")
 			chevron = Image.open(KAG_DIR + "frinkweb/originals/chevron.png")
-			ypos = 30
+			ypos = 24
 			while kd > 0:
 				if kd > 3:
 					self.image.paste(star,((width - 40),ypos),star)
