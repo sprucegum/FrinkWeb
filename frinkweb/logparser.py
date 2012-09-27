@@ -67,7 +67,8 @@ class LogParser(object):
 	def process_database(self):
 		self.calculate_kds()
 		self.count_clanmembers()
-		self.get_avatars()
+		if not self.livelog:
+			self.get_avatars()
 
 	def get_logs(self):
 		#logfile = open('chat-12-08-06-06-18-10.txt','r')
@@ -82,10 +83,10 @@ class LogParser(object):
 			self.livelogname = self.get_logs()[-1]
 			self.livelog = open(KAG_DIR + 'Logs/' + self.livelogname)
 			self.set_day(self.livelogname)
-		new_events = self.livelog.readlines()[seek:]
+		new_events = self.livelog.readlines()[self.ss.logposition:]
 		self.parse_log(new_events)
 		self.process_database()
-		self.ss.logposition = seek+len(new_events)
+		self.ss.logposition = self.ss.logposition+len(new_events)
 		
 
 
@@ -323,11 +324,15 @@ class LogParser(object):
 				try:
 					p = Player.objects.get(printedname=pname)
 					self.ss.players[pname] = p
+					if self.livelog:
+						self.get_avatar(p)
 					return p
 				except:
 					p = Player(name=pname,clan=self.get_clan('NoClan'))
 					p.save()
 					self.ss.players[pname] = p
+					if self.livelog:
+						self.get_avatar(p)
 					return p
 
 	def get_clan(self,cname):
@@ -398,29 +403,32 @@ class LogParser(object):
 		for cname,clan in self.ss.clans.iteritems():
 			clan.update_kd()
 	
+	def get_avatar(self,p):
+		try:
+			print "p:{0}".format(p)
+			a = Avatar.objects.get(player=p)
+			avatar_dict = json.load(urllib2.urlopen('http://{1}/player/{0}/avatar'.format(p.name,KAG_API)))
+			a.small = avatar_dict["small"]
+			a.medium = avatar_dict["medium"]
+			a.large = avatar_dict["large"]
+			print avatar_dict["large"]
+			a.save()
+		except:
+			try:
+				avatar_dict = json.load(urllib2.urlopen('http://{1}/player/{0}/avatar'.format(p.name,KAG_API)))
+				a = Avatar(player=p,small=avatar_dict["small"],medium=avatar_dict["medium"],large=avatar_dict["large"])
+				print avatar_dict["large"]
+				a.save()
+			except:
+				if PRINT_DEBUG: print "No Avatar"
+				
 	def get_avatars(self):
 		print "Getting Avatars"
 		pset = set()
 		for pname,player in self.ss.players.iteritems():
 			pset.add(player)
 		for p in pset:
-			try:
-					print "p:{0}".format(p)
-					a = Avatar.objects.get(player=p)
-					avatar_dict = json.load(urllib2.urlopen('http://{1}/player/{0}/avatar'.format(p.name,KAG_API)))
-					a.small = avatar_dict["small"]
-					a.medium = avatar_dict["medium"]
-					a.large = avatar_dict["large"]
-					print avatar_dict["large"]
-					a.save()
-			except:
-					try:
-						avatar_dict = json.load(urllib2.urlopen('http://{1}/player/{0}/avatar'.format(p.name,KAG_API)))
-						a = Avatar(player=p,small=avatar_dict["small"],medium=avatar_dict["medium"],large=avatar_dict["large"])
-						print avatar_dict["large"]
-						a.save()
-					except:
-						print "No Avatar"
+			self.get_avatar(p)
 
 	def count_clanmembers(self):
 		for cname, clan in self.ss.clans.iteritems():

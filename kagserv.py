@@ -69,7 +69,7 @@ class KagServer(object):
 			return int(stats.read().split()[3])
 
 	def start_server(self):
-		self.ss.start_time = datetime.now() 
+		self.ss.start_time = time()
 		self.run_manager = True
 		self.fresh = True
 		self.ss.logposition = 0
@@ -139,7 +139,7 @@ class KagServer(object):
 			print("processing database")
 			lp.process_database()
 			print("database processed")
-			print("logposition:{0}".format(self.logposition))
+			print("logposition:{0}".format(self.ss.logposition))
 			self.dblock = False
 			return lp
 		return None
@@ -192,7 +192,7 @@ class KagServer(object):
 			self.get_players(),\
 			self.get_uptime()/3600,\
 			self.get_mem()/1024.0,\
-			self.restarts))	
+			self.ss.restarts))	
 
 	def check_update(self):
 		self.last_update_check = time()
