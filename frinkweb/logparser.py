@@ -24,8 +24,11 @@ import settings
 from stats.models import *
 from datetime import datetime, timedelta
 from serverstate import *
+import json
+import urllib2
 
 KAG_DIR = '/home/frink/kag-linux32-dedicated/'
+KAG_API = "192.168.0.90/kagapi"
 
 PRINT_DEBUG = False
 
@@ -64,6 +67,7 @@ class LogParser(object):
 	def process_database(self):
 		self.calculate_kds()
 		self.count_clanmembers()
+		self.get_avatars()
 
 	def get_logs(self):
 		#logfile = open('chat-12-08-06-06-18-10.txt','r')
@@ -393,6 +397,30 @@ class LogParser(object):
 
 		for cname,clan in self.ss.clans.iteritems():
 			clan.update_kd()
+	
+	def get_avatars(self):
+		print "Getting Avatars"
+		pset = set()
+		for pname,player in self.ss.players.iteritems():
+			pset.add(player)
+		for p in pset:
+			try:
+					print "p:{0}".format(p)
+					a = Avatar.objects.get(player=p)
+					avatar_dict = json.load(urllib2.urlopen('http://{1}/player/{0}/avatar'.format(p.name,KAG_API)))
+					a.small = avatar_dict["small"]
+					a.medium = avatar_dict["medium"]
+					a.large = avatar_dict["large"]
+					print avatar_dict["large"]
+					a.save()
+			except:
+					try:
+						avatar_dict = json.load(urllib2.urlopen('http://{1}/player/{0}/avatar'.format(p.name,KAG_API)))
+						a = Avatar(player=p,small=avatar_dict["small"],medium=avatar_dict["medium"],large=avatar_dict["large"])
+						print avatar_dict["large"]
+						a.save()
+					except:
+						print "No Avatar"
 
 	def count_clanmembers(self):
 		for cname, clan in self.ss.clans.iteritems():

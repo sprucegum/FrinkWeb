@@ -28,7 +28,7 @@ class Banner(object):
 		yoster24 = ImageFont.truetype(KAG_DIR + 'frinkweb/stats/static/yoster.ttf',24)
 		yoster12 = ImageFont.truetype(KAG_DIR + 'frinkweb/stats/static/yoster.ttf',12)
 		# Make Canvas
-		width = 600
+		width = 525
 		height = 50
 		self.image = Image.new("RGBA",(width,height),(0,0,0,0))
 		draw = ImageDraw.Draw(self.image)
@@ -147,7 +147,7 @@ class Banner(object):
 			kd = okills/float(deaths)
 			star = Image.open(KAG_DIR + "frinkweb/originals/star.png")
 			chevron = Image.open(KAG_DIR + "frinkweb/originals/chevron.png")
-			ypos = 24
+			ypos = 8
 			while kd > 0:
 				if kd > 3:
 					self.image.paste(star,((width - 40),ypos),star)

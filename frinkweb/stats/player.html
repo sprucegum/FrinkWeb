@@ -20,6 +20,10 @@
 		#pname {
 			display: inline-block;
 		}
+		.gold{
+			text-shadow: 0px 0px 12px #FD0;
+			color: #FD3;
+		}
 	</style>
 {% endblock %}
 
@@ -27,18 +31,8 @@
 		<script>
 			$(document).ready(function() 
 			    { 
-					var HOSTNAME = '192.168.0.90';
+					
 					$("table").tablesorter(); 
-					$.getJSON('http://'+HOSTNAME+'/kagapi/player/{{player.name}}/avatar',function(data){
-						$('#avatar').replaceWith("<img onerror=\"$('#avatar').hide()\" class=\"timespan\" id=\"avatar\" src=\"" + data["medium"] + "\"/>");
-						
-					});
-					$.getJSON('http://'+HOSTNAME+'/kagapi/player/{{player.name}}/info',function(data){
-							if (data["gold"]){
-								$('#pname').css("text-shadow","0px 0px 12px #FD0");
-								$('#pname').css("color","#FD3");
-							}
-					});
 			    } 
 			);
 			
@@ -48,7 +42,9 @@
 
 {% block content %}
 	<div id="banner" class="timespan"><a href='/player/{{player.name}}.png'>Banner</a></div>
-	<div id="player"><img id="avatar"></img><h1><a href="/clan/{{clan}}/">{{clan}}</a> <div id="pname">{{player.name}}</div></h1>
+	<div id="player">
+		{% if player.avatar %}<img id="avatar" class="timespan" onerror="$('#avatar').hide()" src="{{player.avatar.medium}}"></img>{% endif %}
+	<h1><a href="/clan/{{clan}}/">{{clan}}</a> <div {% if player.gold %} class="gold" {% endif %}id="pname">{{player.name}}</div></h1>
 		<div id="stats">
 			<span id="kills">
 				<span id="lkills"><a href="/player/{{player.name}}/{{timespan}}/{{pageinfo.kback}}/{{pageinfo.d}}">&lt</a></span>

@@ -69,10 +69,17 @@ class RCONEvent(models.Model):
 			return self.action
 
 class Avatar(models.Model):
-	player = models.ForeignKey(Player)
+	player = models.OneToOneField(Player)
 	small = models.URLField()
 	medium = models.URLField()
 	large = models.URLField()
+	def __unicode__(self):
+		return self.player
+
+class Collapse():
+	player = models.ForeignKey(Player, related_name = 'collapse_set')
+	time = models.DateTimeField()
+	size = models.IntegerField(default=0)
 	def __unicode__(self):
 		return self.player
 
