@@ -171,7 +171,7 @@ class KagServer(object):
 				elif ((players > 0) and self.fresh):
 					self.fresh = False
 				elif ((players == 0) and not self.fresh):
-					if ((time() - self.start_time)>restart_period):
+					if ((time() - self.ss.start_time)>restart_period):
 						print("Restarting server after {0} hours gameplay".format(self.get_uptime()/3600.0))
 						self.restart_server()
 				elif (((time() - self.last_update_check)/60) > UPDATE_PERIOD*60):
