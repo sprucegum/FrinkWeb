@@ -3,6 +3,7 @@ from datetime import datetime
 from time import time
 
 class ServerState(object):
+		errorstate = False
 		players = 0
 		logposition = 0
 		restarts = 0

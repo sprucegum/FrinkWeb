@@ -25,12 +25,7 @@ class IP(models.Model):
 	def __unicode__(self):
 		return self.address
 
-class RCONEvent(models.Model):
-	admin = models.ForeignKey(Player)
-	action = models.CharField(max_length=255)
-	date = models.DateTimeField()
-	def __unicode__(self):
-			return self.action
+
 
 class Player(models.Model):
 	name = models.CharField(max_length=50)
@@ -66,7 +61,13 @@ class Player(models.Model):
 	def __unicode__(self):
 		return self.name
 
-	
+class RCONEvent(models.Model):
+	admin = models.ForeignKey(Player)
+	action = models.CharField(max_length=255)
+	date = models.DateTimeField()
+	def __unicode__(self):
+			return self.action
+
 class Avatar(models.Model):
 	player = models.ForeignKey(Player)
 	small = models.URLField()

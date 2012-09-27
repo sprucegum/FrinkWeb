@@ -116,7 +116,7 @@ class LogParser(object):
 				chats.append(line)
 			else:
 				otherlines.append(line)
-		#self.add_chats(chats)
+		self.add_chats(chats)
 		return otherlines
 	
 
@@ -270,7 +270,7 @@ class LogParser(object):
 			if PRINT_DEBUG: print "\n{0:22}{1:20}{2:20}{3:20}".format('time','killer','victim','weapon')
 			for kill in kills:
 
-				if PRINT_DEBUG: print "{0[0]:22s}{0[1]:20}{0[2]:20}{0[3]:20}".format(kill.decode('utf-8','ignore'))
+				if PRINT_DEBUG: print "{0[0]:22s}{0[1]:20}{0[2]:20}{0[3]:20}".format(kill)
 				#p = Player.objects.get(printedname__exact=kill[1])
 				p = self.get_player(kill[1])
 				p.add_kill()
@@ -300,12 +300,17 @@ class LogParser(object):
 					a.save()
 				except:
 					if PRINT_DEBUG: print "bad accident"
+					print accident
 					
 	def get_player(self,pname):
 		pname = pname.decode('utf-8','ignore')
 		if pname in self.ss.players:
 			return self.ss.players[pname]
 		else:
+			for pkey in sorted(filter(lambda x: len(x)<len(pname),self.ss.players.keys()),cmp=lambda x,y:cmp(len(y),len(x))):
+				if pname.count(pkey):
+					self.ss.players[pname] = self.ss.players[pkey]
+					return self.ss.players[pkey]
 			try:
 				p = Player.objects.get(name=pname)
 				self.ss.players[pname] = p
@@ -317,6 +322,7 @@ class LogParser(object):
 					return p
 				except:
 					p = Player(name=pname,clan=self.get_clan('NoClan'))
+					p.save()
 					self.ss.players[pname] = p
 					return p
 
@@ -366,7 +372,16 @@ class LogParser(object):
 
 	def add_chats(self,chats):
 		for line in chats:
-			if PRINT_DEBUG: print line.strip()
+			if PRINT_DEBUG: print line
+			ts = self.parse_time(line.split()[0])
+			pname = re.search('(<.*?>)',line).groups()[0].strip('<>')
+			if pname is '':
+				pname = re.search('(<.*>)',line).groups()[0].strip('<>')
+			message = re.split('<.*?>',line)[1].decode('utf-8','ignore').strip()
+			p = self.get_player(pname)
+			if p:
+				c = Chat(player=p,time=ts,text=message)
+				c.save()
 
 	def first_run(self):
 		clan, created = Clan.objects.get_or_create(name="NoClan")
