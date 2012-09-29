@@ -39,7 +39,7 @@
 								<tr>
 									<td>{% if player.avatar %}<img class="player_pic" onerror="this.style.display='none'" src="{{player.avatar.small}}"></img>{% endif %}</td>
 									<td>{{forloop.counter}}</td>
-									<td><a href="/player/{{ player.name }}/{{timespan}}">{{player.name }}</a></td>
+									<td><a {% if player.gold %} class="gold" {% endif %} href="/player/{{ player.name }}/{{timespan}}">{{player.name }}</a></td>
 									<td>{{player.kills}}</td>
 								</tr>
 							{% endfor %}
@@ -64,7 +64,7 @@
 							<tr>
 								<td>{% if player.avatar %}<img class="player_pic" onerror="this.style.display='none'" src="{{player.avatar.small}}"></img>{% endif %}</td>
 								<td>{{forloop.counter}}</td>
-								<td><a href="/player/{{ player.name }}/{{timespan}}">{{player.name }}</a></td>
+								<td><a {% if player.gold %} class="gold" {% endif %} href="/player/{{ player.name }}/{{timespan}}">{{player.name }}</a></td>
 								<td>{{player.kills}}</td>
 							</tr>
 						{% endfor %}
@@ -89,7 +89,7 @@
 							<tr>
 								<td>{% if player.avatar %}<img class="player_pic" onerror="this.style.display='none'" src="{{player.avatar.small}}"></img>{% endif %}</td>
 								<td>{{forloop.counter}}</td>
-								<td><a href="/player/{{ player.name }}/{{timespan}}">{{player.name }}</a></td>
+								<td><a {% if player.gold %} class="gold" {% endif %} href="/player/{{ player.name }}/{{timespan}}">{{player.name }}</a></td>
 								<td>{{player.kills}}</td>
 							</tr>
 						{% endfor %}
@@ -114,7 +114,7 @@
 							<tr>
 								<td>{% if player.avatar %}<img  class="player_pic" onerror="this.style.display='none'" src="{{player.avatar.small}}"></img>{% endif %}</td>
 								<td>{{forloop.counter}}</td>
-								<td><a href="/player/{{ player.name }}/{{timespan}}">{{player.name }}</a></td>
+								<td><a {% if player.gold %} class="gold" {% endif %} href="/player/{{ player.name }}/{{timespan}}">{{player.name }}</a></td>
 								<td>{{player.kills}}</td>
 							</tr>
 						{% endfor %}
@@ -139,7 +139,7 @@
 							<tr>
 								<td>{% if player.avatar %}<img  class="player_pic" onerror="this.style.display='none'" src="{{player.avatar.small}}"></img>{% endif %}</td>
 								<td>{{forloop.counter}}</td>
-								<td><a href="/player/{{ player.name }}/{{timespan}}">{{player.name }}</a></td>
+								<td><a {% if player.gold %} class="gold" {% endif %} href="/player/{{ player.name }}/{{timespan}}">{{player.name }}</a></td>
 								<td>{{player.kills}}</td>
 							</tr>
 						{% endfor %}
@@ -163,7 +163,7 @@
 							<tr>
 								<td>{% if player.avatar %}<img  class="player_pic" onerror="this.style.display='none'" src="{{player.avatar.small}}"></img>{% endif %}</td>
 								<td>{{forloop.counter}}</td>
-								<td><a href="/player/{{ player.name }}/{{timespan}}">{{player.name }}</a></td>
+								<td><a {% if player.gold %} class="gold" {% endif %} href="/player/{{ player.name }}/{{timespan}}">{{player.name }}</a></td>
 								<td>{{player.kills}}</td>
 							</tr>
 						{% endfor %}

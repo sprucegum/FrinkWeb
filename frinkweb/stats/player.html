@@ -50,13 +50,13 @@
 					{% for kill in kills %}
 						<tr>
 							<td>{% if kill.victim.avatar %}<img class="player_pic" onerror="this.style.display='none'" src="{{kill.victim.avatar.small}}"></img>{% endif %}</td>
-							<td><a href="/player/{{ kill.victim.name }}/{{timespan}}">{{ kill.victim.name }}</a></td><td> {{kill.weapon.name}}</td></tr>
+							<td><a {% if kill.victim.gold %} class="gold" {% endif %} href="/player/{{ kill.victim.name }}/{{timespan}}">{{ kill.victim.name }}</a></td><td> {{kill.weapon.name}}</td></tr>
 					{% endfor %}
 		    		</table>
 				{{pageinfo.kpage}}/{{nk}}
 			</span>
 			<span id="deaths">
-				<span id="ldeaths"><a href="/player/{{player.name}}/{{timespan}}/{{pageinfo.k}}/{{pageinfo.dback}}">&lt</a></span>
+				<span id="ldeaths"><a  href="/player/{{player.name}}/{{timespan}}/{{pageinfo.k}}/{{pageinfo.dback}}">&lt</a></span>
 				Deaths
 				<span id="mdeaths"><a href="/player/{{player.name}}/{{timespan}}/{{pageinfo.k}}/{{pageinfo.dnext}}">&gt</a></span>
 				<table >
@@ -64,8 +64,8 @@
 					<tbody>
 					{% for kill in deaths %}
 						<tr>
-							<td>{% if kill.victim.avatar %}<img class="player_pic" onerror="this.style.display='none'" src="{{kill.player.avatar.small}}"></img>{% endif %}</td>
-							<td><a href="/player/{{ kill.player.name }}/{{timespan}}">{{ kill.player.name }}</a></td><td> {{kill.weapon.name}}</td></tr>
+							<td>{% if kill.player.avatar %}<img class="player_pic" onerror="this.style.display='none'" src="{{kill.player.avatar.small}}"></img>{% endif %}</td>
+							<td><a {% if kill.player.gold %} class="gold" {% endif %} href="/player/{{ kill.player.name }}/{{timespan}}">{{ kill.player.name }}</a></td><td> {{kill.weapon.name}}</td></tr>
 					{% endfor %}
 					</tbody>
 			    	</table>
