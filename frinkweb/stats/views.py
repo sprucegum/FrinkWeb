@@ -57,8 +57,12 @@ def top_players(request,timespan=''):
 			kd = '{0:.3}'.format(float(kills)/float(deaths))
 		else: 
 			kd = 0
-		top.append({'name':player.name,'kills':kills,'deaths':deaths,'kd':kd})
-	
+			
+		try:
+			top.append({'name':player.name,'kills':kills,'deaths':deaths,'kd':kd,'avatar':{'large':player.avatar.large,'medium':player.avatar.medium,'small':player.avatar.small},'gold':player.gold})
+		except:
+			top.append({'name':player.name,'kills':kills,'deaths':deaths,'kd':kd,'gold':player.gold})
+
 	return render_to_response('top_players.html', {'top_players': top, 'count':top_players.count(), 'timespan':timespan})
 
 def top_clans(request,timespan=''):
@@ -138,7 +142,10 @@ def get_weapon_kills(weapon, tspan):
 		wlist = Player.objects.filter(kill_set__weapon__name=weapon).annotate(wkills = Count('kill_set')).order_by('-wkills')[:10]
 		playerlist = []
 		for p in wlist:
-			playerlist.append({'name':p.name,'kills':p.wkills})
+			try:
+				playerlist.append({'name':p.name,'kills':p.wkills,'avatar':{'large':p.avatar.large,'medium':p.avatar.medium,'small':p.avatar.small},'gold':p.gold})
+			except:
+				playerlist.append({'name':p.name,'kills':p.wkills,'gold':p.gold})
 		return playerlist
 	else:
 		playerlist_raw = Player.objects.filter(kill_set__time__gte=tspan, kill_set__weapon__name=weapon)
@@ -148,10 +155,12 @@ def get_weapon_kills(weapon, tspan):
 			if p.name not in players_seen:
 				weaponkills = p.kill_set.filter(time__gte=tspan).filter(weapon__name=weapon).count()
 				if weaponkills:
-					playerlist.append({'name':p.name,'kills':weaponkills})
+					try:
+						playerlist.append({'name':p.name,'kills':weaponkills,'avatar':{'large':p.avatar.large,'medium':p.avatar.medium,'small':p.avatar.small},'gold':p.gold})
+					except:
+						playerlist.append({'name':p.name,'kills':weaponkills,'gold':p.gold})
 					players_seen.append(p.name)
-		playerlist = sorted(playerlist,key=lambda k: k['kills'])
-		playerlist.reverse()
+		playerlist = sorted(playerlist,key=lambda k: k['kills'],reverse=True)
 		return playerlist[:10]
 
 def top_weapons(request,timespan=''):
@@ -229,7 +238,10 @@ def clan(request, clanname, timespan=''):
 				if kills or deaths:
 					if deaths:
 						kd = "{0:3.2}".format(float(kills)/float(deaths))
-					temp_clan_players.append({'name':name,'kills':kills,'deaths':deaths,'kd':kd})
+					try:
+						temp_clan_players.append({'name':name,'kills':kills,'deaths':deaths,'kd':kd,'avatar':{'large':player.avatar.large,'medium':player.avatar.medium,'small':player.avatar.small},'gold':player.gold})
+					except:
+						temp_clan_players.append({'name':name,'kills':kills,'deaths':deaths,'kd':kd,'gold':player.gold})
 			clan_players = sorted(temp_clan_players, key=lambda k: k['kills'])
 			clan_players.reverse()
 			

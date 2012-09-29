@@ -27,6 +27,7 @@
 						<table>
 							<thead>
 								<tr>
+									<th></th>
 									<th>Rank</th>
 									<th>Player</th>
 									<th>Kills</th>
@@ -36,6 +37,7 @@
 							<tbody>
 							{% for player in hammer %}
 								<tr>
+									<td>{% if player.avatar %}<img class="player_pic" onerror="this.style.display='none'" src="{{player.avatar.small}}"></img>{% endif %}</td>
 									<td>{{forloop.counter}}</td>
 									<td><a href="/player/{{ player.name }}/{{timespan}}">{{player.name }}</a></td>
 									<td>{{player.kills}}</td>
@@ -50,6 +52,7 @@
 					<table>
 						<thead>
 							<tr>
+								<th></th>
 								<th>Rank</th>
 								<th>Player</th>
 								<th>Kills</th>
@@ -59,6 +62,7 @@
 						<tbody>
 						{% for player in sword %}
 							<tr>
+								<td>{% if player.avatar %}<img class="player_pic" onerror="this.style.display='none'" src="{{player.avatar.small}}"></img>{% endif %}</td>
 								<td>{{forloop.counter}}</td>
 								<td><a href="/player/{{ player.name }}/{{timespan}}">{{player.name }}</a></td>
 								<td>{{player.kills}}</td>
@@ -73,6 +77,7 @@
 					<table>
 						<thead>
 							<tr>
+								<th></th>
 								<th>Rank</th>
 								<th>Player</th>
 								<th>Kills</th>
@@ -82,6 +87,7 @@
 						<tbody>
 						{% for player in bow %}
 							<tr>
+								<td>{% if player.avatar %}<img class="player_pic" onerror="this.style.display='none'" src="{{player.avatar.small}}"></img>{% endif %}</td>
 								<td>{{forloop.counter}}</td>
 								<td><a href="/player/{{ player.name }}/{{timespan}}">{{player.name }}</a></td>
 								<td>{{player.kills}}</td>
@@ -96,6 +102,7 @@
 					<table>
 						<thead>
 							<tr>
+								<th></th>
 								<th>Rank</th>
 								<th>Player</th>
 								<th>Kills</th>
@@ -105,6 +112,7 @@
 						<tbody>
 						{% for player in bomb %}
 							<tr>
+								<td>{% if player.avatar %}<img  class="player_pic" onerror="this.style.display='none'" src="{{player.avatar.small}}"></img>{% endif %}</td>
 								<td>{{forloop.counter}}</td>
 								<td><a href="/player/{{ player.name }}/{{timespan}}">{{player.name }}</a></td>
 								<td>{{player.kills}}</td>
@@ -119,6 +127,7 @@
 					<table>
 						<thead>
 							<tr>
+								<th></th>
 								<th>Rank</th>
 								<th>Player</th>
 								<th>Kills</th>
@@ -128,6 +137,7 @@
 						<tbody>
 						{% for player in catapult %}
 							<tr>
+								<td>{% if player.avatar %}<img  class="player_pic" onerror="this.style.display='none'" src="{{player.avatar.small}}"></img>{% endif %}</td>
 								<td>{{forloop.counter}}</td>
 								<td><a href="/player/{{ player.name }}/{{timespan}}">{{player.name }}</a></td>
 								<td>{{player.kills}}</td>
@@ -151,6 +161,7 @@
 						<tbody>
 						{% for player in foot %}
 							<tr>
+								<td>{% if player.avatar %}<img  class="player_pic" onerror="this.style.display='none'" src="{{player.avatar.small}}"></img>{% endif %}</td>
 								<td>{{forloop.counter}}</td>
 								<td><a href="/player/{{ player.name }}/{{timespan}}">{{player.name }}</a></td>
 								<td>{{player.kills}}</td>

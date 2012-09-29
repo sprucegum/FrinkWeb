@@ -34,7 +34,6 @@ from signal import signal, SIGINT
 from random import randint
 from shutil import copy
 
-
 ## SET THIS ON INSTALL
 KAG_DIR = '/home/frink/kag-linux32-dedicated/'
 

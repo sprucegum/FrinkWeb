@@ -20,18 +20,13 @@
 		#pname {
 			display: inline-block;
 		}
-		.gold{
-			text-shadow: 0px 0px 12px #FD0;
-			color: #FD3;
-		}
 	</style>
 {% endblock %}
 
 {% block javascript %}
 		<script>
 			$(document).ready(function() 
-			    { 
-					
+			    { 	
 					$("table").tablesorter(); 
 			    } 
 			);
@@ -51,9 +46,11 @@
 				Kills
 				<span id="mkills"><a href="/player/{{player.name}}/{{timespan}}/{{pageinfo.knext}}/{{pageinfo.d}}"%}>&gt</a></span>
 				<table>
-					<thead><tr><th>Victim</th><th>Weapon</th></tr></thead>
+					<thead><tr><th></th><th>Victim</th><th>Weapon</th></tr></thead>
 					{% for kill in kills %}
-						<tr><td><a href="/player/{{ kill.victim.name }}/{{timespan}}">{{ kill.victim.name }}</a></td><td> {{kill.weapon.name}}</td></tr>
+						<tr>
+							<td>{% if kill.victim.avatar %}<img class="player_pic" onerror="this.style.display='none'" src="{{kill.victim.avatar.small}}"></img>{% endif %}</td>
+							<td><a href="/player/{{ kill.victim.name }}/{{timespan}}">{{ kill.victim.name }}</a></td><td> {{kill.weapon.name}}</td></tr>
 					{% endfor %}
 		    		</table>
 				{{pageinfo.kpage}}/{{nk}}
@@ -63,10 +60,12 @@
 				Deaths
 				<span id="mdeaths"><a href="/player/{{player.name}}/{{timespan}}/{{pageinfo.k}}/{{pageinfo.dnext}}">&gt</a></span>
 				<table >
-					<thead><tr><th>Killer</th><th>Weapon</th></tr></thead>
+					<thead><tr><th></th><th>Killer</th><th>Weapon</th></tr></thead>
 					<tbody>
 					{% for kill in deaths %}
-						<tr><td><a href="/player/{{ kill.player.name }}/{{timespan}}">{{ kill.player.name }}</a></td><td> {{kill.weapon.name}}</td></tr>
+						<tr>
+							<td>{% if kill.victim.avatar %}<img class="player_pic" onerror="this.style.display='none'" src="{{kill.player.avatar.small}}"></img>{% endif %}</td>
+							<td><a href="/player/{{ kill.player.name }}/{{timespan}}">{{ kill.player.name }}</a></td><td> {{kill.weapon.name}}</td></tr>
 					{% endfor %}
 					</tbody>
 			    	</table>

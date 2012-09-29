@@ -1,6 +1,7 @@
 from stats.models import *
 from datetime import datetime
 from time import time
+import pickle
 
 class ServerState(object):
 		errorstate = False
@@ -21,4 +22,13 @@ class ServerState(object):
 		causes = {}
 		def __init__(self):
 			self.birth = datetime.now()
+			
+		def save(self, fpath = './serverstate.pickle'):
+			fobject = file(fpath,'wb')
+			return pickle.save()
+			
+		@classmethod
+		def load(cls, fpath = './serverstate.pickle'):
+			fobject = file(fpath,'rb')
+			return pickle.load(fobject)
 			

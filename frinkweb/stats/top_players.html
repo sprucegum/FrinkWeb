@@ -3,42 +3,15 @@
 {% block style %}
 	<style type="text/css">
 		#top_players {background-color:#900;}
-		.player_pic {
-			max-height:24px;
-			position:relative;
-			background-color:#FFF;
-			opacity: 0.9;
-			-moz-box-shadow: 0px 0px 10px #FFF;
-			-webkit-box-shadow: 0px 0px 10px #FFF;
-			box-shadow: 0px 0px 10px #FFF;
-			border:2px solid #FFF;
-		}
+
 	</style>
 {% endblock %}
 
 {% block javascript %}
 		<script>
-			var plist = [{% for player in top_players %}"{{player.name}}",{% endfor %}];
 			$(document).ready(function(){ 
 				$("table").tablesorter(); 
-				checkGold(0);
 			});
-			
-			function checkGold(i){
-					$.getJSON('http://192.168.0.64/kagapi/player/' + plist[i] + '/avatar',function(data){
-						$('#'+plist[i]+"imgslot").replaceWith("<td><img onerror=\"$('#" + plist[i] + "img').hide()\" id=\""+plist[i]+"img\" class=\"player_pic\" src=\"" + data["small"] + "\"/></td>");
-					});
-					$.getJSON('http://192.168.0.64/kagapi/player/'+plist[i]+'/info',function(data){
-						if (data["gold"]){
-							$('#'+plist[i]).css("text-shadow","0px 0px 12px #FD0");
-							$('#'+plist[i]).css("color","#FD3");
-						}
-						
-						if (i < plist.length){
-							checkGold(i+1)
-						}
-					});
-			}
 		</script>
 {% endblock %}
 
@@ -56,9 +29,9 @@
 			</tr></thead>
 			{% for player in top_players %}
 			<tr>
-				<td id="{{player.name}}imgslot"></td>
+				<td>{% if player.avatar %}<img class="player_pic" onerror="this.style.display='none'" src="{{player.avatar.small}}"></img>{% endif %}</td>
 				<td>{{forloop.counter}}</td>
-				<td><a id="{{player.name}}" href="/player/{{ player.name }}/{{timespan}}">{{ player.name }}</a></td>
+				<td><a id="{{player.name}}" {% if player.gold %} class="gold" {% endif %} href="/player/{{ player.name }}/{{timespan}}">{{ player.name }}</a></td>
 				<td>{{player.kills}}</td>
 				<td>{{player.deaths}}</td>
 				<td>{{player.kd}}</td>
