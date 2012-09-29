@@ -22,10 +22,6 @@ Add more information to player page
 
 Per Weapon Rank tables in database to improve speed
 
-Use API on the backend to query gold status, forum urls (instead of doing it through AJAX)
-	Remove KAG API Proxy
-
-
 Write server state to database
 	Graph Players, kills, deaths, admin presence
 
@@ -43,6 +39,8 @@ SSO Login
 		Make chats searchable
 		
 	Customizable player pages
+	Clan Leaders
+		Clan Management
 	
 Banner Legend
 	Kill Streak Banner
@@ -96,3 +94,5 @@ Automated Video Capture
 Blacklist Network
 	Query a list of trusted servers
 		Synchronize bans
+		
+

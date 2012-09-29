@@ -28,7 +28,7 @@ import json
 import urllib2
 
 KAG_DIR = '/home/frink/kag-linux32-dedicated/'
-KAG_API = "192.168.0.90/kagapi"
+KAG_API = "api.kag2d.com"
 
 PRINT_DEBUG = False
 
