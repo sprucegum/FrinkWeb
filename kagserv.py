@@ -57,6 +57,7 @@ class KagServer(object):
 			self.KAG = self.start_server()
 		else:
 			self.KAG = self.attach_server()
+			self.ss = ServerState.load()
 		self.run_manager = True
 		self.timer = None
 		
@@ -203,6 +204,7 @@ class KagServer(object):
 		return (current_version != this_version)
 
 	def ctrlc(self, signum,frame):
+		self.ss.save()
 		self.run_manager = False
 		self.timer.cancel()
 		print("exiting")

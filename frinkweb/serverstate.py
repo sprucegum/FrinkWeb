@@ -25,10 +25,15 @@ class ServerState(object):
 			
 		def save(self, fpath = './serverstate.pickle'):
 			fobject = file(fpath,'wb')
-			return pickle.save()
+			return pickle.dump(self,fobject)
 			
 		@classmethod
 		def load(cls, fpath = './serverstate.pickle'):
 			fobject = file(fpath,'rb')
 			return pickle.load(fobject)
 			
+		def pset(self):
+			pset = set()
+			for pname,player in self.players.iteritems():
+				 pset.add(player)
+			return pset

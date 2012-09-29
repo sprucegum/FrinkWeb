@@ -69,6 +69,7 @@ class LogParser(object):
 		self.count_clanmembers()
 		if not self.livelog:
 			self.get_avatars()
+			self.get_golds()
 
 	def get_logs(self):
 		#logfile = open('chat-12-08-06-06-18-10.txt','r')
@@ -421,13 +422,23 @@ class LogParser(object):
 				a.save()
 			except:
 				if PRINT_DEBUG: print "No Avatar"
-				
+	
+	def check_gold(self,p):
+		try:
+			info_dict = json.load(urllib2.urlopen('http://{1}/player/{0}/info'.format(p.name,KAG_API)))
+			p.gold = info_dict["gold"]
+			p.save()
+		except:
+			if PRINT_DEBUG: print("Info not found")
+					
+	def get_golds(self):
+		print "Getting Golds!"
+		for p in self.ss.pset():
+			self.check_gold(p)				
+					
 	def get_avatars(self):
 		print "Getting Avatars"
-		pset = set()
-		for pname,player in self.ss.players.iteritems():
-			pset.add(player)
-		for p in pset:
+		for p in self.ss.pset():
 			self.get_avatar(p)
 
 	def count_clanmembers(self):
