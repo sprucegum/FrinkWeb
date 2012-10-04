@@ -142,6 +142,8 @@ class TopCategory(models.Model):
 		return self.name
 		
 class TopTable(models.Model):
+	start = models.DateTimeField()
+	end = models.DateTimeField()
 	category = models.ForeignKey(TopCategory)
 	def __unicode__(self):
 		return self.category
@@ -152,10 +154,6 @@ class TopEntry(models.Model):
 	table = models.ForeignKey(TopTable)
 	def __unicode__(self):
 		return self.player
-		
-
-		
-
 
 class GameRound(models.Model):
 	start = models.DateTimeField()
@@ -169,6 +167,7 @@ class GameRound(models.Model):
 class Life(models.Model):
 	player = models.ForeignKey(Player)
 	kill_set = models.ManyToManyField(Kill)
+	kills = models.IntegerField(default=0)
 	start = models.DateTimeField()
 	end = models.DateTimeField()
 	def __unicode__(self):
@@ -193,16 +192,7 @@ class MultiKill(models.Model):
 	life = models.ForeignKey(Life)
 	def __unicode__(self):
 		return self.player
-	
-class KillingSpree(models.Model):
-	player = models.ForeignKey(Player)
-	victims = models.ManyToManyField(Player, related_name = 'spreevictim_set')
-	kill_set = models.ManyToManyField(Kill, related_name = 'spree')
-	count = models.IntegerField(default=0)
-	life= models.ForeignKey(Life)
-	def __unicode__(self):
-		return self.player
-	
+		
 class Chat(models.Model):
 	player = models.ForeignKey(Player)
 	time = models.DateTimeField()

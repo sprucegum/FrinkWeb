@@ -7,6 +7,7 @@ class ServerState(object):
 		errorstate = False
 		players = 0
 		logposition = 0
+		clogposition = 0
 		restarts = 0
 		memrestarts = 0
 		updates = 0
@@ -20,6 +21,9 @@ class ServerState(object):
 		clans = {}
 		weapons = {}
 		causes = {}
+		openlives = {}
+		opensessions = {}
+		livesleft = True
 		def __init__(self):
 			self.birth = datetime.now()
 			
@@ -37,3 +41,9 @@ class ServerState(object):
 			for pname,player in self.players.iteritems():
 				 pset.add(player)
 			return pset
+		
+		def pcount(self):
+			return len(self.opensessions)
+			
+		def pop_session(self,pname):
+			return self.opensessions[self.players[pname].name]

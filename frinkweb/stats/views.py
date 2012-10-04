@@ -23,6 +23,7 @@ from datetime import datetime, timedelta
 from banner import Banner
 from django.http import HttpResponse
 from blacklist import *
+from heapq import nlargest
 import json
 
 def get_timespan(timespan):
@@ -160,8 +161,10 @@ def get_weapon_kills(weapon, tspan):
 					except:
 						playerlist.append({'name':p.name,'kills':weaponkills,'gold':p.gold})
 					players_seen.append(p.name)
-		playerlist = sorted(playerlist,key=lambda k: k['kills'],reverse=True)
-		return playerlist[:10]
+		playerlist = nlargest(10,playerlist,lambda x:x['kills'])
+
+		return playerlist
+		
 
 def top_weapons(request,timespan=''):
 	tspan, timespan = get_timespan(timespan)	

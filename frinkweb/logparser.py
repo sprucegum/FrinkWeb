@@ -42,21 +42,39 @@ class LogParser(object):
 	def parse_logs(self):
 		self.first_run()
 		
-		chats = self.get_logs()			
+		chats = self.get_logs()	
+		console_logs = self.get_console_logs()		
 		# Grab all the log files
 		# call parse log on each log file
 		# call move log on each parsed log
 		for chat in chats[:-1]:
+			
 			print(chat)
+			clogname, console_logs = self.matching_console_log(chat,console_logs)
 			self.set_day(chat)
 			logfile = open(KAG_DIR +'Logs/'+chat)
+			clogfile = open(KAG_DIR + 'Logs/'+clogname)
 			log = logfile.readlines()
+			clog = clogfile.readlines()
 			self.ss.lasthour = 0
 			self.ss.days = 0
-			self.unparsed = self.parse_log(log)
+			self.unparsed, self.cunparsed = self.parse_log(log,clog)
 			self.move_log(logfile,chat)
+			self.move_log(clogfile,clogname)
 			
 		self.process_database()
+	
+	def matching_console_log(self,chat,console_logs):
+		datestamp = chat.strip('chatx.-')
+		for clog in console_logs:
+			if clog.count(datestamp):
+				console_logs.remove(clog)
+				return (clog, console_logs)
+		for clog in console_logs:
+			if clog.count(datestamp[:-2]):
+				console_logs.remove(clog)
+				return (clog, console_logs)
+		return (None, console_logs)
 
 	def set_day(self,chat):
 		datearr = re.match('chat-([0-9]{2}-[0-9]{2}-[0-9]{2}).*',chat).groups()[0].split('-')
@@ -72,43 +90,123 @@ class LogParser(object):
 			self.get_golds()
 
 	def get_logs(self):
-		#logfile = open('chat-12-08-06-06-18-10.txt','r')
-		#logfile = open('chat-12-08-06-19-31-02.txt','r')
-		#log = logfile.readlines()
 		chats = filter(lambda line:line.count("chat"),walk(KAG_DIR + 'Logs').next()[2])
 		chats.sort()
 		return (chats)
+		
+	def get_console_logs(self):
+		console_logs = filter(lambda line:line.count("console"),walk(KAG_DIR + 'Logs').next()[2])
+		console_logs.sort()
+		return (console_logs)
 
 	def parse_livelog(self):
 		if self.livelog is None:
 			self.livelogname = self.get_logs()[-1]
+			self.liveclogname = self.get_console_logs()[-1]
 			self.livelog = open(KAG_DIR + 'Logs/' + self.livelogname)
+			self.liveclog = open(KAG_DIR + 'Logs/' + self.liveclogname)
 			self.set_day(self.livelogname)
 		new_events = self.livelog.readlines()[self.ss.logposition:]
-		self.parse_log(new_events)
+		new_cevents = self.liveclog.readlines()[self.ss.clogposition:]
+		self.parse_log(new_events, new_cevents)
 		self.process_database()
 		self.ss.logposition = self.ss.logposition+len(new_events)
+		self.ss.clogposition = self.ss.clogposition+len(new_cevents)
 		
 
 
 	def close_livelog(self):
 		self.move_log(self.livelog,self.livelogname)
 
-	def parse_log(self, log):
+	def parse_log(self, chatlog, consolelog):
 		# Read through a log
 		unparsed = []
-		for line in log:
+		cunparsed = []
+		while chatlog or consolelog:
+			try:
+				if (chatlog and consolelog):
+					if len(consolelog[0].strip()) == 0:
+						consolelog.pop(0)
+					if len(chatlog[0].strip()) == 0:
+						chatlog.pop(0)
+					elif self.parse_time(chatlog[0].split()[0],False) <= self.parse_time(consolelog[0].split()[0],False):
+						unparsed.append(self.parse_chat_line(chatlog.pop(0)))
+					elif (self.parse_time(chatlog[0].split()[0],False) > self.parse_time(consolelog[0].split()[0],False)):
+						cunparsed.append(self.parse_console_line(consolelog.pop(0)))
+				elif chatlog:
+					unparsed.append(self.parse_chat_line(chatlog.pop(0)))
+				else:
+					cunparsed.append(self.parse_console_line(consolelog.pop(0)))			
+			except:
+				print chatlog[0]
+				print consolelog[0]
+				break
+		return (unparsed, cunparsed)
+		
+	def parse_chat_line(self,line):
+		line = self.get_players([line])
+		if line:
+			line = self.get_chats(line)
+		if line:
+			line = self.get_kills(line)
+		if line:
+			line = self.get_accidents(line)
+		return line
+		
+	def parse_console_line(self,line):
+		# player connects
+		# [22:40:58] * chestabo connected (admin: 0 guard 0 gold 0)
+		if re.search('^\[.*\] \*{1}.* connected .*',line):
+			pname = re.split('connected',line)[0].split()[2]
+			ptime = self.parse_time(line.split()[0])
+			self.create_play_session(pname,ptime)
+		# player disconnects
+		# [22:41:39] Player chestabo left the game (players left 2)
+		elif re.search('^\[.*\] Player .* left the game .*',line):
+			pname = re.split('Player',line)[1].split()[0]
+			ptime = self.parse_time(line.split()[0])
+			self.close_play_session(pname,ptime)
+		# match end
+		# [23:03:57] *Match Ended*
+		elif re.search('^\[.*\] \*Match Ended\*',line):
+			# end all lives/streaks/etc/
 			
-			line = self.get_players([line])
-			if line:
-				line = self.get_chats(line)
-			if line:
-				line = self.get_kills(line)
-			if line:
-				line = self.get_accidents(line)
-			if line:
-				unparsed.append(line[0])
-		return unparsed
+			
+		# match start
+		# [23:03:57] *Match Started*
+		elif re.search('^\[.*\] \*Match Ended\*',line):
+			self.ss.livesleft = True
+			# start new lives for all current players
+
+		# units depleted
+		# [23:03:48] Can't spawn units depleted
+		elif re.search('''^\[.*\] Can't spawn units depleted''',line):
+			self.ss.livesleft = False
+			#stop making new lives for players when they die
+
+		# collapse
+		# [23:05:12] COLLAPSE by Sir Meta_Data (size 8 blocks)
+		elif re.search('''^\[.*\] COLLAPSE by .*''',line):
+			pname = re.split('\(size [0-9]* blocks\)',line)[0].split()[-1]
+			ptime = self.parse_time(line.split()[0])
+			collapse_size = int(re.split('^\[.*\] COLLAPSE by .* \(size',line)[-1].split()[0])
+			p = self.get_player(pname)
+			c = Collapse(player = p, time = ptime, size = collapse_size)
+			c.save()
+		
+		return line
+		
+	def create_play_session(self,pname,ptime):
+		p = self.get_player(pname)
+		s = Session(player = p, start = ptime, end = ptime)
+		s.save()
+		self.ss.opensessions[p.name] = s
+		
+	def close_play_session(self,pname,ptime):
+		p = self.get_player(pname)
+		s = self.ss.pop_session(p.name)
+		s.end = ptime
+		s.save()
 
 	def move_log(self, logfile, chat):
 		logfile.close()
@@ -256,13 +354,13 @@ class LogParser(object):
 		# collapses, admin presence, gold players, number of players
 		return otherlines
 	
-	def parse_time(self,logtime):
-
+	def parse_time(self,logtime, commit = True):
 		(hour, minute, second) = logtime.strip('[]').split(':')
-		if int(hour) < self.ss.lasthour:
-			self.ss.days += 1
-			print "incrementing day. days:{0} hour:{1} lasthour:{2} logtime:{3}".format(self.ss.days, hour, self.ss.lasthour, logtime)
-		self.ss.lasthour = int(hour)
+		if commit:
+			if int(hour) < self.ss.lasthour:
+				self.ss.days += 1
+				print "incrementing day. days:{0} hour:{1} lasthour:{2} logtime:{3}".format(self.ss.days, hour, self.ss.lasthour, logtime)
+			self.ss.lasthour = int(hour)
 		return (datetime(int(self.year),
 					int(self.month), 
 					int(self.day),
@@ -275,7 +373,7 @@ class LogParser(object):
 		if kills:
 			if PRINT_DEBUG: print "\n{0:22}{1:20}{2:20}{3:20}".format('time','killer','victim','weapon')
 			for kill in kills:
-
+				ktime = self.parse_time(kill[0])
 				if PRINT_DEBUG: print "{0[0]:22s}{0[1]:20}{0[2]:20}{0[3]:20}".format(kill)
 				#p = Player.objects.get(printedname__exact=kill[1])
 				p = self.get_player(kill[1])
@@ -287,27 +385,40 @@ class LogParser(object):
 				v.add_death()
 
 				w = self.get_weapon(kill[3])					
-				k = Kill(time=kill[0],player=p,victim=v,weapon=w)
+				k = Kill(time=ktime,player=p,victim=v,weapon=w)
 				k.save()
-
-				
 
 	def add_accidents(self,accidents):
 		if accidents:
 			if PRINT_DEBUG: print "\n{0:22}{1:20}{2:20}".format("time","victim","cause")
 			for accident in accidents:
 				try:
+					ktime = self.parse_time(accident[0])
 					if PRINT_DEBUG: print "{0[0]:22s}{0[1]:20}{0[2]:20}".format(accident.decode('utf-8','ignore'))
 					p = self.get_player(accident[1])
 					p.add_death()
 					
 					c = self.get_cause(accident[2])
-					a = Accident(player = p,time = accident[0],cause = c)
+					a = Accident(player = p,time = ktime,cause = c)
 					a.save()
 				except:
 					if PRINT_DEBUG: print "bad accident"
 					print accident
 					
+	def add_life(self,pname,kill,time):
+		if pname in self.ss.openlives:
+			life = self.ss.openlives[pname]
+			life.kill_set.add(kill)
+			life.save()
+		else:
+			p = self.ss.players[pname]
+			life = Life(player = p, start = )
+
+	def end_life(self,pname,time):
+		life = self.ss.openlives[pname]
+		life.kill_set.add(kill)
+		life.save()
+
 	def get_player(self,pname):
 		pname = pname.decode('utf-8','ignore')
 		if pname in self.ss.players:
@@ -365,8 +476,6 @@ class LogParser(object):
 			for player in players:
 				if PRINT_DEBUG: print player.decode('utf-8','ignore')
 				self.get_player(player)
-				#except:
-					#if PRINT_DEBUG: print("bad player")
 
 	def add_clans(self,clans):
 		if clans:
@@ -379,7 +488,6 @@ class LogParser(object):
 				p.clan = c		
 				p.save()
 				
-
 	def add_chats(self,chats):
 		for line in chats:
 			if PRINT_DEBUG: print line

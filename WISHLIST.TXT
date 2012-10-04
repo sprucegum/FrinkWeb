@@ -25,6 +25,8 @@ Per Weapon Rank tables in database to improve speed
 Write server state to database
 	Graph Players, kills, deaths, admin presence
 
+Graphical scoreboard to embed on forums
+
 SSO Login
 	Map Submission
 		Map voting
