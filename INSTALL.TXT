@@ -8,6 +8,7 @@ frinkweb/stats/player.html
 frinkweb/stats/clan.html
 frinkweb/stats/banner.py
 frinkweb/stats/frink.html
+frinkweb/stats/etc/sites-available/frink.conf
 
 ## ALSO, YOU'LL NEED TO ENABLE cc_killfeed = 1 TO Base/Scripts/dedicated_autoconfig.gm
 

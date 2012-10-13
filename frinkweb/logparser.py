@@ -170,7 +170,7 @@ class LogParser(object):
 		# [23:03:57] *Match Ended*
 		elif re.search('^\[.*\] \*Match Ended\*',line):
 			# end all lives/streaks/etc/
-			
+			pass
 			
 		# match start
 		# [23:03:57] *Match Started*
@@ -412,7 +412,7 @@ class LogParser(object):
 			life.save()
 		else:
 			p = self.ss.players[pname]
-			life = Life(player = p, start = )
+			life = Life(player = p, start = datetime.now())
 
 	def end_life(self,pname,time):
 		life = self.ss.openlives[pname]
