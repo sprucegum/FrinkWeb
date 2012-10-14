@@ -100,7 +100,7 @@ def player_search(request):
 	if request.GET.__contains__("term"):
 		name = request.GET["term"]
 	
-	players = Player.objects.filter(name__startswith=name).values("name")[:10]
+	players = Player.objects.filter(name__istartswith=name).values("name")[:10]
 	plist = [player["name"] for player in players]
 	return HttpResponse(json.dumps(plist), mimetype="application/json")
 
