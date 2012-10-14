@@ -47,7 +47,7 @@ MEMLIMIT = 200 		# megabytes, restart the server even if occupied if it hits thi
 RESTART_PERIOD = 20 	# minutes, minimum time between restarts 
 POLL_PERIOD = 10	# seconds, how often to see how many people are playing, perform logic.
 UPDATE_PERIOD = 30	# minutes, how often to check for updates.
-STATS_PERIOD = 1	# minutes, how often to update stats.
+STATS_PERIOD = 10	# seconds, how often to update stats.
 
 class KagServer(object):
 	def __init__(self):
@@ -180,7 +180,7 @@ class KagServer(object):
 							self.ss.updates += 1
 							self.restart_server()
 							
-				if (((time() - self.last_stats_update)>(STATS_PERIOD*60)) and (players>0)):
+				if ((time() - self.last_stats_update)>STATS_PERIOD):
 					self.parse_live()
 
 					
