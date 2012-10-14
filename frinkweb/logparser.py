@@ -107,10 +107,11 @@ class LogParser(object):
 			self.set_day(self.livelogname)
 		new_events = self.livelog.readlines()[self.ss.logposition:]
 		new_cevents = self.liveclog.readlines()[self.ss.clogposition:]
-		self.parse_log(new_events, new_cevents)
-		self.process_database()
 		self.ss.logposition = self.ss.logposition+len(new_events)
 		self.ss.clogposition = self.ss.clogposition+len(new_cevents)
+		self.parse_log(new_events, new_cevents)
+		self.process_database()
+
 
 
 	def close_livelog(self):
@@ -194,6 +195,13 @@ class LogParser(object):
 			p = self.ss.get_player(pname)
 			c = Collapse(player = p, time = ptime, size = collapse_size)
 			c.save()
+
+		elif re.search('''^\[.*\] WARNING: API call failed .*''',line):
+			#Shit just got real.
+			self.ss.errorstate = True
+
+
+
 		return line
 
 	def move_log(self, logfile, chat):

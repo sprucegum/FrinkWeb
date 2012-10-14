@@ -130,15 +130,15 @@ class KagServer(object):
 
 	def parse_live(self):
 		if not self.dblock:
-			print("updating database")
+			#print("updating database")
 			self.dblock = True
 			lp = LogParser(self.ss)
 			self.last_stats_update = time()
 			lp.parse_livelog()
-			print("processing database")
+			#print("processing database")
 			lp.process_database()
-			print("database processed")
-			print("logposition:{0}".format(self.ss.logposition))
+			#print("database processed")
+			#print("logposition:{0}".format(self.ss.logposition))
 			self.dblock = False
 			return lp
 		return None
@@ -159,11 +159,17 @@ class KagServer(object):
 			if self.run_manager:			
 				t = Timer(poll_period, self.manager)
 				t.start()
-				players = self.get_players()
+
 				#print("Players:{0}".format(players))
 				if not self.running():
 					self.KAG = self.start_server()
-				
+
+				if ((time() - self.last_stats_update)>STATS_PERIOD):
+					self.parse_live()
+				players = self.get_players()
+				if self.ss.errorstate and not players:
+					self.restart_server()
+
 				elif (self.get_mem()> memory_limit):
 					self.ss.memrestarts += 1
 					self.restart_server()
@@ -180,8 +186,7 @@ class KagServer(object):
 							self.ss.updates += 1
 							self.restart_server()
 							
-				if ((time() - self.last_stats_update)>STATS_PERIOD):
-					self.parse_live()
+
 
 					
 						
