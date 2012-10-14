@@ -16,6 +16,9 @@ Copyright (C) 2012  Jade Lacosse
 '''
 
 from django.db import models
+import json
+import urllib2
+KAG_API = "api.kag2d.com"
 
 # Create your models here.
 
@@ -57,6 +60,29 @@ class Player(models.Model):
 			self.kd = str(self.kills/float(self.deaths))
 		self.save()
 
+	def get_avatar(self):
+		try:
+			a = Avatar.objects.get(player=self)
+			avatar_dict = json.load(urllib2.urlopen('http://{1}/player/{0}/avatar'.format(self.name,KAG_API)))
+			a.small = avatar_dict["small"]
+			a.medium = avatar_dict["medium"]
+			a.large = avatar_dict["large"]
+			a.save()
+		except:
+			try:
+				avatar_dict = json.load(urllib2.urlopen('http://{1}/player/{0}/avatar'.format(self.name,KAG_API)))
+				a = Avatar(player=self,small=avatar_dict["small"],medium=avatar_dict["medium"],large=avatar_dict["large"])
+				a.save()
+			except:
+				return
+
+	def check_gold(self):
+		try:
+			info_dict = json.load(urllib2.urlopen('http://{1}/player/{0}/info'.format(self.name,KAG_API)))
+			self.gold = info_dict["gold"]
+			self.save()
+		except:
+			return
 
 	def __unicode__(self):
 		return self.name
@@ -76,7 +102,7 @@ class Avatar(models.Model):
 	def __unicode__(self):
 		return self.player
 
-class Collapse():
+class Collapse(models.Model):
 	player = models.ForeignKey(Player, related_name = 'collapse_set')
 	time = models.DateTimeField()
 	size = models.IntegerField(default=0)
@@ -152,6 +178,8 @@ class TopEntry(models.Model):
 	player = models.ForeignKey(Player)
 	rank = models.IntegerField(default=0)
 	table = models.ForeignKey(TopTable)
+	kills = models.IntegerField(default=0)
+	deaths = models.IntegerField(default=0)
 	def __unicode__(self):
 		return self.player
 
