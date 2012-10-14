@@ -24,6 +24,8 @@ class ServerState(object):
 		openlives = {}
 		opensessions = {}
 		livesleft = True
+		matchover = False
+		last_time = None
 		def __init__(self):
 			self.birth = datetime.now()
 			
@@ -37,91 +39,117 @@ class ServerState(object):
 			return pickle.load(fobject)
 			
 		def pset(self):
-			pset = set()
-			for pname,player in self.players.iteritems():
-				 pset.add(player)
+			pset = []
+			for pname, session in self.opensessions.iteritems():
+				pset.append(session.p)
 			return pset
 		
 		def pcount(self):
 			return len(self.opensessions)
 
+		def server_restart(self):
+			self.end_match(self.last_time)
 
-        # Some Processing code.
+		# Some Processing code.
+		def start_match(self,dtime):
+			self.last_time = dtime
+			self.matchover = False
+			for sesh in self.opensessions.keys():
+				self.add_life(sesh.player.name,dtime)
 
-        def create_play_session(self,pname,ptime):
-            p = self.get_player(pname)
-            s = Session(player = p, start = ptime, end = ptime)
-            s.save()
-            self.opensessions[p.name] = s
+		def end_match(self,dtime):
+			self.last_time = dtime
+			for pname in self.openlives.keys():
+				self.end_life(pname,dtime)
+			self.matchover = True
 
-        def close_play_session(self,pname,ptime):
-            p = self.get_player(pname)
-            s = self.pop_session(p.name)
-            s.end = ptime
-            s.save()
+		def create_play_session(self,pname,ptime):
+			self.last_time = ptime
+			pname = pname.decode('utf-8','ignore')
+			p = self.get_player(pname)
+			s = Session(player = p, start = ptime, end = ptime)
+			s.save()
+			self.opensessions[p.name] = s
+			self.add_life(p.name,ptime)
+			return p
 
-        def add_life(self,pname,kill,time):
-            if pname in self.openlives:
-                life = self.openlives[pname]
-                life.kill_set.add(kill)
-                life.save()
-            else:
-                p = self.players[pname]
-                life = Life(player = p, start = datetime.now())
 
-        def end_life(self,pname,time):
-            life = self.openlives[pname]
-            life.kill_set.add(kill)
-            life.save()
+		def close_play_session(self,pname,ptime):
+			self.last_time = ptime
+			pname = pname.decode('utf-8','ignore')
+			p = self.get_player(pname)
+			s =  self.opensessions[p.name]
+			del self.opensessions[p.name]
+			if self.openlives[p.name]:
+				self.end_life(p.name,ptime)
+			s.end = ptime
+			s.save()
 
-        def get_player(self,pname):
-            pname = pname.decode('utf-8','ignore')
-            if pname in self.players:
-                return self.players[pname]
-            else:
-                for pkey in sorted(filter(lambda x: len(x)<len(pname),self.players.keys()),cmp=lambda x,y:cmp(len(y),len(x))):
-                    if pname.count(pkey):
-                        self.players[pname] = self.players[pkey]
-                        return self.players[pkey]
-                try:
-                    p = Player.objects.get(name=pname)
-                    self.players[pname] = p
-                    return p
-                except:
-                    try:
-                        p = Player.objects.get(printedname=pname)
-                        self.players[pname] = p
-                        if self.livelog:
-                            self.get_avatar(p)
-                        return p
-                    except:
-                        p = Player(name=pname,clan=self.get_clan('NoClan'))
-                        p.save()
-                        self.players[pname] = p
-                        if self.livelog:
-                            self.get_avatar(p)
-                        return p
+		def add_life(self,pname,atime):
+			self.last_time = atime
+			pname = pname.decode('utf-8','ignore')
+			p = self.get_player(pname)
+			life = Life(player = p, start=atime, end=atime)
+			life.save()
+			self.openlives[p.name] = life
 
-        def get_clan(self,cname):
-            if cname.decode('utf-8','ignore') in self.clans:
-                return self.clans[cname.decode('utf-8','ignore')]
-            else:
-                c, g = Clan.objects.get_or_create(name=cname.decode('utf-8','ignore'))
-                self.clans[cname.decode('utf-8','ignore')] = c
-                return c
+		def end_life(self,pname,etime):
+			self.last_time = etime
+			if not self.matchover:
+				pname = pname.decode('utf-8','ignore')
+				p = self.get_player(pname)
+				life = self.openlives[p.name]
+				life.end = etime
+				life.save()
+				del self.openlives[p.name]
+				if self.livesleft:
+					self.add_life(p.name,etime)
 
-        def get_weapon(self,wname):
-            if wname in self.weapons:
-                return self.weapons[wname]
-            else:
-                w, g = Weapon.objects.get_or_create(name = wname)
-                self.weapons[wname] = w
-                return w
+		def get_player(self,pname):
+			pname = pname.decode('utf-8','ignore')
+			if pname in self.players:
+				return self.players[pname]
+			else:
+				for pkey in sorted(filter(lambda x: len(x)<len(pname),self.players.keys()),cmp=lambda x,y:cmp(len(y),len(x))):
+					if pname.count(pkey):
+						self.players[pname] = self.players[pkey]
+						return self.players[pkey]
+				try:
+					p = Player.objects.get(name=pname)
+					self.players[pname] = p
+					return p
+				except:
+					try:
+						p = Player.objects.get(printedname=pname)
+						self.players[pname] = p
+						return p
+					except:
+						p = Player(name=pname,clan=self.get_clan('NoClan'))
+						p.save()
+						self.players[pname] = p
 
-        def get_cause(self,cname):
-            if cname in self.causes:
-                return self.causes[cname]
-            else:
-                c, created = Cause.objects.get_or_create(name = cname)
-                self.causes[cname] = c
-                return c
+						return p
+
+		def get_clan(self,cname):
+			if cname.decode('utf-8','ignore') in self.clans:
+				return self.clans[cname.decode('utf-8','ignore')]
+			else:
+				c, g = Clan.objects.get_or_create(name=cname.decode('utf-8','ignore'))
+				self.clans[cname.decode('utf-8','ignore')] = c
+				return c
+
+		def get_weapon(self,wname):
+			if wname in self.weapons:
+				return self.weapons[wname]
+			else:
+				w, g = Weapon.objects.get_or_create(name = wname)
+				self.weapons[wname] = w
+				return w
+
+		def get_cause(self,cname):
+			if cname in self.causes:
+				return self.causes[cname]
+			else:
+				c, created = Cause.objects.get_or_create(name = cname)
+				self.causes[cname] = c
+				return c

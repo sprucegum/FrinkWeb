@@ -1,18 +1,18 @@
 '''
-FrinkStats Log Parser Utility 
+FrinkStats Log Parser Utility
 Copyright (C) 2012  Jade Lacosse
  This program is free software: you can redistribute it and/or modify
-    it under the terms of the GNU Affero General Public License as
-    published by the Free Software Foundation, either version 3 of the
-    License, or (at your option) any later version.
+	it under the terms of the GNU Affero General Public License as
+	published by the Free Software Foundation, either version 3 of the
+	License, or (at your option) any later version.
 
-    This program is distributed in the hope that it will be useful,
-    but WITHOUT ANY WARRANTY; without even the implied warranty of
-    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-    GNU Affero General Public License for more details.
+	This program is distributed in the hope that it will be useful,
+	but WITHOUT ANY WARRANTY; without even the implied warranty of
+	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+	GNU Affero General Public License for more details.
 
-    You should have received a copy of the GNU Affero General Public License
-    along with this program.  If not, see <http://www.gnu.org/licenses/>.
+	You should have received a copy of the GNU Affero General Public License
+	along with this program.  If not, see <http://www.gnu.org/licenses/>.
 '''
 
 from os import chdir, getcwd, mkdir, walk, remove, environ
@@ -24,46 +24,45 @@ import settings
 from stats.models import *
 from datetime import datetime, timedelta
 from serverstate import *
-import json
-import urllib2
 
 KAG_DIR = '/home/frink/kag-linux32-dedicated/'
-KAG_API = "api.kag2d.com"
+
 
 PRINT_DEBUG = False
 
 class LogParser(object):
-	def __init__(self, ss = ServerState()):	
+
+	def __init__(self, ss = ServerState()):
 		self.ss = ss
 		self.freshlog = True
 		self.livelog = None
 
-		
+
 	def parse_logs(self):
 		self.first_run()
-		
-		chats = self.get_logs()	
-		console_logs = self.get_console_logs()		
+
+		chats = self.get_logs()
+		console_logs = self.get_console_logs()
 		# Grab all the log files
 		# call parse log on each log file
 		# call move log on each parsed log
 		for chat in chats[:-1]:
-			
-			print(chat)
+
 			clogname, console_logs = self.matching_console_log(chat,console_logs)
 			self.set_day(chat)
 			logfile = open(KAG_DIR +'Logs/'+chat)
 			clogfile = open(KAG_DIR + 'Logs/'+clogname)
 			log = logfile.readlines()
 			clog = clogfile.readlines()
+			self.ss.server_restart()
 			self.ss.lasthour = 0
 			self.ss.days = 0
 			self.unparsed, self.cunparsed = self.parse_log(log,clog)
 			self.move_log(logfile,chat)
 			self.move_log(clogfile,clogname)
-			
+
 		self.process_database()
-	
+
 	def matching_console_log(self,chat,console_logs):
 		datestamp = chat.strip('chatx.-')
 		for clog in console_logs:
@@ -93,7 +92,7 @@ class LogParser(object):
 		chats = filter(lambda line:line.count("chat"),walk(KAG_DIR + 'Logs').next()[2])
 		chats.sort()
 		return (chats)
-		
+
 	def get_console_logs(self):
 		console_logs = filter(lambda line:line.count("console"),walk(KAG_DIR + 'Logs').next()[2])
 		console_logs.sort()
@@ -112,7 +111,6 @@ class LogParser(object):
 		self.process_database()
 		self.ss.logposition = self.ss.logposition+len(new_events)
 		self.ss.clogposition = self.ss.clogposition+len(new_cevents)
-		
 
 
 	def close_livelog(self):
@@ -123,26 +121,23 @@ class LogParser(object):
 		unparsed = []
 		cunparsed = []
 		while chatlog or consolelog:
-			try:
-				if (chatlog and consolelog):
-					if len(consolelog[0].strip()) == 0:
-						consolelog.pop(0)
-					if len(chatlog[0].strip()) == 0:
-						chatlog.pop(0)
-					elif self.parse_time(chatlog[0].split()[0],False) <= self.parse_time(consolelog[0].split()[0],False):
-						unparsed.append(self.parse_chat_line(chatlog.pop(0)))
-					elif (self.parse_time(chatlog[0].split()[0],False) > self.parse_time(consolelog[0].split()[0],False)):
-						cunparsed.append(self.parse_console_line(consolelog.pop(0)))
-				elif chatlog:
+
+			if chatlog and consolelog:
+				while not re.search('^\[.*\].*', consolelog[0]):
+					consolelog.pop(0)
+				while not re.search('^\[.*\].*', chatlog[0]):
+					chatlog.pop(0)
+
+				if self.parse_time(chatlog[0].split()[0],False) <= self.parse_time(consolelog[0].split()[0],False):
 					unparsed.append(self.parse_chat_line(chatlog.pop(0)))
-				else:
-					cunparsed.append(self.parse_console_line(consolelog.pop(0)))			
-			except:
-				print chatlog[0]
-				print consolelog[0]
-				break
+				elif (self.parse_time(chatlog[0].split()[0],False) > self.parse_time(consolelog[0].split()[0],False)):
+					cunparsed.append(self.parse_console_line(consolelog.pop(0)))
+			elif chatlog:
+				unparsed.append(self.parse_chat_line(chatlog.pop(0)))
+			else:
+				cunparsed.append(self.parse_console_line(consolelog.pop(0)))
 		return (unparsed, cunparsed)
-		
+
 	def parse_chat_line(self,line):
 		line = self.get_players([line])
 		if line:
@@ -152,29 +147,35 @@ class LogParser(object):
 		if line:
 			line = self.get_accidents(line)
 		return line
-		
+
 	def parse_console_line(self,line):
-		# player connects
-		# [22:40:58] * chestabo connected (admin: 0 guard 0 gold 0)
 		if re.search('^\[.*\] \*{1}.* connected .*',line):
+			# player connects
+			# [22:40:58] * chestabo connected (admin: 0 guard 0 gold 0)
 			pname = re.split('connected',line)[0].split()[2]
 			ptime = self.parse_time(line.split()[0])
-			self.create_play_session(pname,ptime)
+			p = self.ss.create_play_session(pname,ptime)
+
 		# player disconnects
 		# [22:41:39] Player chestabo left the game (players left 2)
-		elif re.search('^\[.*\] Player .* left the game .*',line):
-			pname = re.split('Player',line)[1].split()[0]
+
+		elif re.search('^\[.*\] Player .* left the game .*', line):
+			pname = re.split('Player',line)[1]
+			pname = re.split('left the game',pname)[0].strip()
 			ptime = self.parse_time(line.split()[0])
-			self.close_play_session(pname,ptime)
+			self.ss.close_play_session(pname,ptime)
+
 		# match end
 		# [23:03:57] *Match Ended*
-		elif re.search('^\[.*\] \*Match Ended\*',line):
+		elif re.search('^\[.*\] \*Match Ended\*', line):
+			ptime = self.parse_time(line.split()[0])
+			self.ss.end_match(ptime)
 			# end all lives/streaks/etc/
-			pass
-			
+
 		# match start
 		# [23:03:57] *Match Started*
 		elif re.search('^\[.*\] \*Match Ended\*',line):
+			self.ss.start_match(self.parse_time(line.split()[0]))
 			self.ss.livesleft = True
 			# start new lives for all current players
 
@@ -190,28 +191,15 @@ class LogParser(object):
 			pname = re.split('\(size [0-9]* blocks\)',line)[0].split()[-1]
 			ptime = self.parse_time(line.split()[0])
 			collapse_size = int(re.split('^\[.*\] COLLAPSE by .* \(size',line)[-1].split()[0])
-			p = self.get_player(pname)
+			p = self.ss.get_player(pname)
 			c = Collapse(player = p, time = ptime, size = collapse_size)
 			c.save()
-		
 		return line
-		
-	def create_play_session(self,pname,ptime):
-		p = self.get_player(pname)
-		s = Session(player = p, start = ptime, end = ptime)
-		s.save()
-		self.ss.opensessions[p.name] = s
-		
-	def close_play_session(self,pname,ptime):
-		p = self.get_player(pname)
-		s = self.ss.pop_session(p.name)
-		s.end = ptime
-		s.save()
 
 	def move_log(self, logfile, chat):
 		logfile.close()
 		move(KAG_DIR + '''Logs/{0}'''.format(chat), KAG_DIR + '''Parsed/{0}'''.format(chat))
-	
+
 	def get_chats(self,loglines):
 		chats = []
 		otherlines = []
@@ -222,7 +210,7 @@ class LogParser(object):
 				otherlines.append(line)
 		self.add_chats(chats)
 		return otherlines
-	
+
 
 	def get_kills(self,loglines):
 		# check for each type of kill
@@ -237,37 +225,37 @@ class LogParser(object):
 					victim = re.split('with',re.split('slew',line)[1])[0].strip().split()[-1]
 					ktime = self.parse_time(line.split()[0])
 					kills.append([ktime,killer,victim,'sword'])
-			
+
 				elif re.search('^\[.*\] .* shot .*',line):
 					killer = re.split('shot',line)[0].split()[-1]
 					victim = re.split('with',re.split('shot',line)[1])[0].strip().split()[-1]
 					ktime = self.parse_time(line.split()[0])
 					kills.append([ktime,killer,victim,'bow'])
-			
+
 				elif re.search('^\[.*\] .* pushed .* to',line):
 					killer = re.split('pushed',line)[0].split()[-1]
 					victim = re.split('to (his|her)',re.split('pushed',line)[1])[0].strip().split()[-1]
 					ktime = self.parse_time(line.split()[0])
 					kills.append([ktime,killer,victim,'foot'])
-			
+
 				elif re.search('^\[.*\] .* pushed .* on',line):
 					killer = re.split('pushed',line)[0].split()[-1]
 					victim = re.split('on a',re.split('pushed',line)[1])[0].strip().split()[-1]
 					ktime = self.parse_time(line.split()[0])
 					kills.append([ktime,killer,victim,'spikes'])
-			
+
 				elif re.search('''^\[.*\] .* gibbed \S+\s?\S* into pieces''',line):
 					killer = re.split('gibbed',line)[0].split()[-1]
 					victim = re.split('into pieces',re.split('gibbed',line)[1])[0].strip().split()[-1]
 					ktime = self.parse_time(line.split()[0])
 					kills.append([ktime,killer,victim,'bomb'])
-			
+
 				elif re.search('^\[.*\] .* hammered .*',line):
 					killer = re.split('hammered',line)[0].split()[-1]
 					victim = re.split('to death',re.split('hammered',line)[1])[0].strip().split()[-1]
 					ktime = self.parse_time(line.split()[0])
 					kills.append([ktime,killer,victim,'hammer'])
-				
+
 				elif re.search('^\[.*\] .* assisted in squashing .* ',line):
 					killer = re.split('assisted',line)[0].split()[-1]
 					victim = re.split('under a',re.split('assisted',line)[1])[0].strip().split()[-1]
@@ -281,7 +269,8 @@ class LogParser(object):
 
 				else:
 					otherlines.append(line)
-			except:
+			except Exception as e:
+				print e
 				if PRINT_DEBUG: print "Bad Line:\n{0}".format(line)
 		self.add_kills(kills)
 		return otherlines
@@ -302,17 +291,17 @@ class LogParser(object):
 				victim = re.split('fell',line)[0].split()[-1]
 				dtime = self.parse_time(line.split()[0])
 				accidents.append([dtime,victim,'spikes'])
-			
+
 			elif re.search('''^\[.*\] .* was squashed''',line):
 				victim = re.split('was squashed',line)[0].split()[-1]
 				dtime = self.parse_time(line.split()[0])
 				accidents.append([dtime,victim,'collapse'])
-			
+
 			elif re.search('''^\[.*\] .* gibbed\s+into''',line):
 				victim = re.split('gibbed',line)[0].split()[-1]
 				dtime = self.parse_time(line.split()[0])
 				accidents.append([dtime,victim,'bomb'])
-			
+
 			elif re.search('''^\[.*\] .* took some''',line):
 				victim = re.split('took',line)[0].split()[-1]
 				dtime = self.parse_time(line.split()[0])
@@ -332,60 +321,69 @@ class LogParser(object):
 				if re.search('Unnamed player is now known as',line):
 					players.append(re.split('Unnamed player is now known as',line.strip())[1].strip())
 				elif re.search('is now known as',line):
+					# to improve this algorithm, I should identify the player name by finding the
+					# text in common between the old and new name
 					clan_nameline = re.split('is now known as',line.strip())
-					playername = clan_nameline[0].split()[1].strip()
-					printedname = clan_nameline[1].split()[-1].strip()
+					playername = clan_nameline[0].split()[-1].strip()
+					printedname = clan_nameline[-1].split()[-1].strip()
 					clanname = re.split(re.escape(playername),clan_nameline[1])[0].strip()
 					clans.append([playername,clanname,printedname])
 				else:
 					otherlines.append(line)
 			except:
-				print "Can't Parse '{0}'".format(line) 
-				
+				print "Can't Parse '{0}'".format(line)
+
 		# See what players have played in this log, how long they played
 		# how many disconnects
 		# ping bans, kick bans, clan membership
-		self.add_players(players)
+
+		#self.add_players(players)
 		self.add_clans(clans)
 		return otherlines
 
 	def get_events(self,loglines):
 		# get matches, team wins, map votes, greifer calls
 		# collapses, admin presence, gold players, number of players
-		return otherlines
-	
+		return loglines
+
 	def parse_time(self,logtime, commit = True):
-		(hour, minute, second) = logtime.strip('[]').split(':')
-		if commit:
-			if int(hour) < self.ss.lasthour:
-				self.ss.days += 1
-				print "incrementing day. days:{0} hour:{1} lasthour:{2} logtime:{3}".format(self.ss.days, hour, self.ss.lasthour, logtime)
-			self.ss.lasthour = int(hour)
-		return (datetime(int(self.year),
-					int(self.month), 
-					int(self.day),
-					int(hour),
-					int(minute),
-					int(second))+timedelta(days=self.ss.days))
-	
+		try:
+			(hour, minute, second) = logtime.strip('[]').split(':')
+			if commit:
+				if int(hour) < self.ss.lasthour:
+					self.ss.days += 1
+					print "incrementing day. days:{0} hour:{1} lasthour:{2} logtime:{3}".format(self.ss.days, hour, self.ss.lasthour, logtime)
+				self.ss.lasthour = int(hour)
+			return (datetime(int(self.year),
+						int(self.month),
+						int(self.day),
+						int(hour),
+						int(minute),
+						int(second))+timedelta(days=self.ss.days))
+		except Exception as e:
+			print logtime
+			print e
+
+
+
 	def add_kills(self,kills):
-		
+
 		if kills:
 			if PRINT_DEBUG: print "\n{0:22}{1:20}{2:20}{3:20}".format('time','killer','victim','weapon')
 			for kill in kills:
-				ktime = self.parse_time(kill[0])
+
 				if PRINT_DEBUG: print "{0[0]:22s}{0[1]:20}{0[2]:20}{0[3]:20}".format(kill)
 				#p = Player.objects.get(printedname__exact=kill[1])
-				p = self.get_player(kill[1])
+				p = self.ss.get_player(kill[1])
 				p.add_kill()
 
-			
 				#v = Player.objects.get(printedname__exact=kill[2])
-				v = self.get_player(kill[2])					
+				v = self.ss.get_player(kill[2])
 				v.add_death()
 
-				w = self.get_weapon(kill[3])					
-				k = Kill(time=ktime,player=p,victim=v,weapon=w)
+				w = self.ss.get_weapon(kill[3])
+				k = Kill(time=kill[0],player=p,victim=v,weapon=w)
+				self.ss.end_life(v.name,kill[0])
 				k.save()
 
 	def add_accidents(self,accidents):
@@ -393,101 +391,35 @@ class LogParser(object):
 			if PRINT_DEBUG: print "\n{0:22}{1:20}{2:20}".format("time","victim","cause")
 			for accident in accidents:
 				try:
-					ktime = self.parse_time(accident[0])
+					ktime = accident[0]
 					if PRINT_DEBUG: print "{0[0]:22s}{0[1]:20}{0[2]:20}".format(accident.decode('utf-8','ignore'))
-					p = self.get_player(accident[1])
+					p = self.ss.get_player(accident[1])
 					p.add_death()
-					
-					c = self.get_cause(accident[2])
+					self.ss.end_life(p.name,ktime)
+					c = self.ss.get_cause(accident[2])
 					a = Accident(player = p,time = ktime,cause = c)
 					a.save()
 				except:
 					if PRINT_DEBUG: print "bad accident"
 					print accident
-					
-	def add_life(self,pname,kill,time):
-		if pname in self.ss.openlives:
-			life = self.ss.openlives[pname]
-			life.kill_set.add(kill)
-			life.save()
-		else:
-			p = self.ss.players[pname]
-			life = Life(player = p, start = datetime.now())
-
-	def end_life(self,pname,time):
-		life = self.ss.openlives[pname]
-		life.kill_set.add(kill)
-		life.save()
-
-	def get_player(self,pname):
-		pname = pname.decode('utf-8','ignore')
-		if pname in self.ss.players:
-			return self.ss.players[pname]
-		else:
-			for pkey in sorted(filter(lambda x: len(x)<len(pname),self.ss.players.keys()),cmp=lambda x,y:cmp(len(y),len(x))):
-				if pname.count(pkey):
-					self.ss.players[pname] = self.ss.players[pkey]
-					return self.ss.players[pkey]
-			try:
-				p = Player.objects.get(name=pname)
-				self.ss.players[pname] = p
-				return p
-			except:
-				try:
-					p = Player.objects.get(printedname=pname)
-					self.ss.players[pname] = p
-					if self.livelog:
-						self.get_avatar(p)
-					return p
-				except:
-					p = Player(name=pname,clan=self.get_clan('NoClan'))
-					p.save()
-					self.ss.players[pname] = p
-					if self.livelog:
-						self.get_avatar(p)
-					return p
-
-	def get_clan(self,cname):
-		if cname.decode('utf-8','ignore') in self.ss.clans:
-			return self.ss.clans[cname.decode('utf-8','ignore')]
-		else:
-			c, g = Clan.objects.get_or_create(name=cname.decode('utf-8','ignore'))
-			self.ss.clans[cname.decode('utf-8','ignore')] = c
-			return c
-
-	def get_weapon(self,wname):
-		if wname in self.ss.weapons:
-			return self.ss.weapons[wname]
-		else:
-			w, g = Weapon.objects.get_or_create(name = wname)
-			self.ss.weapons[wname] = w
-			return w
-
-	def get_cause(self,cname):
-		if cname in self.ss.causes:
-			return self.ss.causes[cname]
-		else:
-			c, created = Cause.objects.get_or_create(name = cname)
-			self.ss.causes[cname] = c
-			return c
 
 	def add_players(self,players):
 		if players:
 			for player in players:
 				if PRINT_DEBUG: print player.decode('utf-8','ignore')
-				self.get_player(player)
+				self.ss.get_player(player)
 
 	def add_clans(self,clans):
 		if clans:
 			for pname, cname, printedname in clans:
-				p = self.get_player(pname)
+				p = self.ss.get_player(pname)
 				p.printedname = printedname.decode('utf-8','ignore')
 
-				c = self.get_clan(cname)
+				c = self.ss.get_clan(cname)
 				c.save()
-				p.clan = c		
+				p.clan = c
 				p.save()
-				
+
 	def add_chats(self,chats):
 		for line in chats:
 			if PRINT_DEBUG: print line
@@ -496,7 +428,7 @@ class LogParser(object):
 			if pname is '':
 				pname = re.search('(<.*>)',line).groups()[0].strip('<>')
 			message = re.split('<.*?>',line)[1].decode('utf-8','ignore').strip()
-			p = self.get_player(pname)
+			p = self.ss.get_player(pname)
 			if p:
 				c = Chat(player=p,time=ts,text=message)
 				c.save()
@@ -511,44 +443,24 @@ class LogParser(object):
 
 		for cname,clan in self.ss.clans.iteritems():
 			clan.update_kd()
-	
-	def get_avatar(self,p):
-		try:
-			print "p:{0}".format(p)
-			a = Avatar.objects.get(player=p)
-			avatar_dict = json.load(urllib2.urlopen('http://{1}/player/{0}/avatar'.format(p.name,KAG_API)))
-			a.small = avatar_dict["small"]
-			a.medium = avatar_dict["medium"]
-			a.large = avatar_dict["large"]
-			print avatar_dict["large"]
-			a.save()
-		except:
-			try:
-				avatar_dict = json.load(urllib2.urlopen('http://{1}/player/{0}/avatar'.format(p.name,KAG_API)))
-				a = Avatar(player=p,small=avatar_dict["small"],medium=avatar_dict["medium"],large=avatar_dict["large"])
-				print avatar_dict["large"]
-				a.save()
-			except:
-				if PRINT_DEBUG: print "No Avatar"
-	
-	def check_gold(self,p):
-		try:
-			info_dict = json.load(urllib2.urlopen('http://{1}/player/{0}/info'.format(p.name,KAG_API)))
-			p.gold = info_dict["gold"]
-			p.save()
-		except:
-			if PRINT_DEBUG: print("Info not found")
-					
+
 	def get_golds(self):
 		print "Getting Golds!"
 		for p in self.ss.pset():
-			self.check_gold(p)				
-					
+			p.check_gold()
+
 	def get_avatars(self):
 		print "Getting Avatars"
 		for p in self.ss.pset():
-			self.get_avatar(p)
+			p.get_avatar()
 
 	def count_clanmembers(self):
 		for cname, clan in self.ss.clans.iteritems():
 			clan.update_members()
+
+
+
+if __name__ == '__main__':
+	print "FrinkWeb Log Parser"
+	lp = LogParser()
+	lp.parse_logs()
