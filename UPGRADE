@@ -1,0 +1,11 @@
+
+
+sudo su postgres
+psql
+
+DROP DATABASE frinkstats;
+CREATE DATABASE frinkstats;
+GRANT ALL PRIVILEGES ON DATABASE frinkstats TO frink;
+
+python ./manage.py sql stats
+python ./manage.py syncdb
