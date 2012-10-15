@@ -43,6 +43,9 @@ class ServerState(object):
 			for pname in self.opensessions.keys():
 				pset.append(self.get_player(pname))
 			return pset
+
+		def known_players(self):
+			return set(self.players.values())
 		
 		def pcount(self):
 			return len(self.opensessions)

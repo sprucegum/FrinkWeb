@@ -185,11 +185,7 @@ class KagServer(object):
 						if self.check_update():
 							self.ss.updates += 1
 							self.restart_server()
-							
 
-
-					
-						
 
 	def state(self):
 		print("Players:{0} Uptime:{1:.2}h Mem:{2:.2}m Restarts:{3}".format(\
