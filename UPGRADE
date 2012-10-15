@@ -1,11 +1,18 @@
-
+## WARNING: THIS PROCESS WILL DESTROY ALL YOUR OLD STATS ##
+# The structure of the database has changed, so we need to entirely rebuild it.
 
 sudo su postgres
 psql
+
 
 DROP DATABASE frinkstats;
 CREATE DATABASE frinkstats;
 GRANT ALL PRIVILEGES ON DATABASE frinkstats TO frink;
 
+
+cd /home/frink/kag-linux/frinkweb/
+mv ../Parsed/* ../Logs/
 python ./manage.py sql stats
 python ./manage.py syncdb
+
+python logparser.py
