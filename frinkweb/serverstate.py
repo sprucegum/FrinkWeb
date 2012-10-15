@@ -40,8 +40,8 @@ class ServerState(object):
 			
 		def pset(self):
 			pset = []
-			for pname, session in self.opensessions.iteritems():
-				pset.append(session.p)
+			for pname in self.opensessions.keys():
+				pset.append(self.get_player(pname))
 			return pset
 		
 		def pcount(self):

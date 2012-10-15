@@ -24,6 +24,8 @@ import settings
 from stats.models import *
 from datetime import datetime, timedelta
 from serverstate import *
+from threading import *
+from Queue import Queue
 
 KAG_DIR = '/home/frink/kag-linux32-dedicated/'
 
@@ -85,8 +87,7 @@ class LogParser(object):
 		self.calculate_kds()
 		self.count_clanmembers()
 		if not self.livelog:
-			self.get_avatars()
-			self.get_golds()
+			self.query_api(self.ss.known_players())
 
 	def get_logs(self):
 		chats = filter(lambda line:line.count("chat"),walk(KAG_DIR + 'Logs').next()[2])
@@ -452,23 +453,46 @@ class LogParser(object):
 		for cname,clan in self.ss.clans.iteritems():
 			clan.update_kd()
 
-	def get_golds(self):
-		print "Getting Golds!"
-		for p in self.ss.pset():
-			p.check_gold()
+	def query_api(self,plist):
+		#spawn a pool of threads, and pass them queue instance
+		pqueue = Queue()
+		for i in range(8):
+			t = KagApiQThread(pqueue)
+			t.setDaemon(True)
+			t.start()
 
-	def get_avatars(self):
-		print "Getting Avatars"
-		for p in self.ss.pset():
-			p.get_avatar()
+		#populate queue with data
+		for player in plist:
+			pqueue.put(player)
+		#wait on the queue until everything has been processed
+		pqueue.join()
 
 	def count_clanmembers(self):
 		for cname, clan in self.ss.clans.iteritems():
 			clan.update_members()
 
+class KagApiQThread(Thread):
+	def __init__(self, pqueue):
+		Thread.__init__(self)
+		self.pqueue = pqueue
+
+	def run(self):
+		while True:
+			player = self.pqueue.get()
+			print player.name
+			#grabs urls of hosts and prints first 1024 bytes of page
+			player.get_avatar()
+			player.check_gold()
+
+			#signals to queue job is done
+			self.pqueue.task_done()
+
 
 
 if __name__ == '__main__':
-	print "FrinkWeb Log Parser"
+	print "FrinkWeb Log Parser\nparsing logs ..."
+	start = datetime.now()
 	lp = LogParser()
 	lp.parse_logs()
+	print "task completed"
+	print datetime.now() - start
