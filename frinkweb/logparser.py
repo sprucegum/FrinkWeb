@@ -27,7 +27,7 @@ from serverstate import *
 from threading import *
 from Queue import Queue
 
-KAG_DIR = '/home/frink/kag-linux32-dedicated/'
+KAG_DIR = '/home/frink/FrinkWeb/'
 
 
 PRINT_DEBUG = False
@@ -52,6 +52,8 @@ class LogParser(object):
 
 			clogname, console_logs = self.matching_console_log(chat,console_logs)
 			self.set_day(chat)
+			print KAG_DIR +'Logs/'+chat
+			print KAG_DIR +'Logs/'+clogname
 			logfile = open(KAG_DIR +'Logs/'+chat)
 			clogfile = open(KAG_DIR + 'Logs/'+clogname)
 			log = logfile.readlines()
@@ -165,7 +167,8 @@ class LogParser(object):
 			pname = re.split('Player',line)[1]
 			pname = re.split('left the game',pname)[0].strip()
 			ptime = self.parse_time(line.split()[0])
-			self.ss.close_play_session(pname,ptime)
+			if pname:
+				self.ss.close_play_session(pname,ptime)
 
 		# match end
 		# [23:03:57] *Match Ended*
@@ -280,7 +283,7 @@ class LogParser(object):
 					otherlines.append(line)
 			except Exception as e:
 				print e
-				if PRINT_DEBUG: print "Bad Line:\n{0}".format(line)
+				print "Bad Line:\n{0}".format(line)
 		self.add_kills(kills)
 		return otherlines
 
@@ -356,22 +359,27 @@ class LogParser(object):
 		return loglines
 
 	def parse_time(self,logtime, commit = True):
-		try:
-			(hour, minute, second) = logtime.strip('[]').split(':')
+		dmod = 0
+		(hour, minute, second) = logtime.strip('[]').split(':')
+		if int(hour) < self.ss.lasthour:
+			dmod = 1
 			if commit:
-				if int(hour) < self.ss.lasthour:
-					self.ss.days += 1
-					print "incrementing day. days:{0} hour:{1} lasthour:{2} logtime:{3}".format(self.ss.days, hour, self.ss.lasthour, logtime)
-				self.ss.lasthour = int(hour)
-			return (datetime(int(self.year),
-						int(self.month),
-						int(self.day),
-						int(hour),
-						int(minute),
-						int(second))+timedelta(days=self.ss.days))
+				dmod = 0
+				self.ss.days += 1
+				print "incrementing day. days:{0} hour:{1} lasthour:{2} logtime:{3}".format(self.ss.days, hour, self.ss.lasthour, logtime)
+		if commit:
+			self.ss.lasthour = int(hour)
+		return (datetime(int(self.year),
+					int(self.month),
+					int(self.day),
+					int(hour),
+					int(minute),
+					int(second))+timedelta(days=(self.ss.days + dmod)))
+		'''
 		except Exception as e:
 			print logtime
 			print e
+		'''
 
 
 
@@ -399,18 +407,15 @@ class LogParser(object):
 		if accidents:
 			if PRINT_DEBUG: print "\n{0:22}{1:20}{2:20}".format("time","victim","cause")
 			for accident in accidents:
-				try:
-					ktime = accident[0]
-					if PRINT_DEBUG: print "{0[0]:22s}{0[1]:20}{0[2]:20}".format(accident.decode('utf-8','ignore'))
-					p = self.ss.get_player(accident[1])
-					p.add_death()
-					self.ss.end_life(p.name,ktime)
-					c = self.ss.get_cause(accident[2])
-					a = Accident(player = p,time = ktime,cause = c)
-					a.save()
-				except:
-					if PRINT_DEBUG: print "bad accident"
-					print accident
+				ktime = accident[0]
+				if PRINT_DEBUG: print "{0[0]:22s}{0[1]:20}{0[2]:20}".format(accident.decode('utf-8','ignore'))
+				p = self.ss.get_player(accident[1])
+				p.add_death()
+				self.ss.end_life(p.name,ktime)
+				c = self.ss.get_cause(accident[2])
+				a = Accident(player = p,time = ktime,cause = c)
+				a.save()
+
 
 	def add_players(self,players):
 		if players:

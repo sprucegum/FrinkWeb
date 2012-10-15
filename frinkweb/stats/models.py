@@ -224,7 +224,7 @@ class MultiKill(models.Model):
 class Chat(models.Model):
 	player = models.ForeignKey(Player)
 	time = models.DateTimeField()
-	text = models.CharField(max_length=255)
+	text = models.CharField(max_length=2048)
 	def __unicode__(self):
 		return self.text
 

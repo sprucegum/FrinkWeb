@@ -67,6 +67,7 @@ class ServerState(object):
 			self.matchover = True
 
 		def create_play_session(self,pname,ptime):
+			#print "opensession:"+pname
 			self.last_time = ptime
 			pname = pname.decode('utf-8','ignore')
 			p = self.get_player(pname)
@@ -78,15 +79,20 @@ class ServerState(object):
 
 
 		def close_play_session(self,pname,ptime):
-			self.last_time = ptime
-			pname = pname.decode('utf-8','ignore')
-			p = self.get_player(pname)
-			s =  self.opensessions[p.name]
-			del self.opensessions[p.name]
-			if self.openlives[p.name]:
-				self.end_life(p.name,ptime)
-			s.end = ptime
-			s.save()
+			try:
+				#print "closesession:"+pname
+				self.last_time = ptime
+				pname = pname.decode('utf-8','ignore')
+				p = self.get_player(pname)
+				s =  self.opensessions[p.name]
+				del self.opensessions[p.name]
+				if self.openlives[p.name]:
+					self.end_life(p.name,ptime)
+				s.end = ptime
+				s.save()
+			except Exception as e:
+				#print e
+				return
 
 		def add_life(self,pname,atime):
 			self.last_time = atime

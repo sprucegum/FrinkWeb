@@ -168,7 +168,9 @@ class KagServer(object):
 					self.parse_live()
 				players = self.get_players()
 				if self.ss.errorstate and not players:
+					self.ss.errorstate = False
 					self.restart_server()
+					
 
 				elif (self.get_mem()> memory_limit):
 					self.ss.memrestarts += 1
