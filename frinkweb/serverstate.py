@@ -70,7 +70,7 @@ class ServerState(object):
 			#print "opensession:"+pname
 			self.last_time = ptime
 			pname = pname.decode('utf-8','ignore')
-			p = self.get_player(pname)
+			p = self.get_player(pname,known_correct=True)
 			s = Session(player = p, start = ptime, end = ptime)
 			s.save()
 			self.opensessions[p.name] = s
@@ -114,29 +114,45 @@ class ServerState(object):
 				if self.livesleft:
 					self.add_life(p.name,etime)
 
-		def get_player(self,pname):
+		def get_player(self,pname,known_correct = False):
 			pname = pname.decode('utf-8','ignore')
 			if pname in self.players:
 				return self.players[pname]
-			else:
-				for pkey in sorted(filter(lambda x: len(x)<len(pname),self.players.keys()),cmp=lambda x,y:cmp(len(y),len(x))):
-					if pname.count(pkey):
-						self.players[pname] = self.players[pkey]
-						return self.players[pkey]
+			elif known_correct:
 				try:
 					p = Player.objects.get(name=pname)
 					self.players[pname] = p
+					print pname + ':' + p.name
+					return p
+				except:
+						p = Player(name=pname,clan=self.get_clan('NoClan'))
+						p.save()
+						self.players[pname] = p
+						print pname + ':' + p.name
+						return p
+			else:
+				for pkey in sorted(filter(lambda x: len(x)<len(pname),self.players.keys()),cmp=lambda x,y:cmp(len(y),len(x))):
+					if pname.endswith(pkey):
+						self.players[pname] = self.players[pkey]
+						p = self.players[pkey]
+						print pname + ':' + p.name
+						return p
+				try:
+					p = Player.objects.get(name=pname)
+					self.players[pname] = p
+					print pname + ':' + p.name
 					return p
 				except:
 					try:
 						p = Player.objects.get(printedname=pname)
 						self.players[pname] = p
+						print pname + ':' + p.name
 						return p
 					except:
 						p = Player(name=pname,clan=self.get_clan('NoClan'))
 						p.save()
 						self.players[pname] = p
-
+						print pname + ':' + p.name
 						return p
 
 		def get_clan(self,cname):
