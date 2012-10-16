@@ -27,7 +27,7 @@ from serverstate import *
 from threading import *
 from Queue import Queue
 
-KAG_DIR = '/home/frink/FrinkWeb/'
+KAG_DIR = '/home/jadel/FrinkWeb/'
 
 
 PRINT_DEBUG = False
@@ -427,8 +427,6 @@ class LogParser(object):
 		if clans:
 			for pname, cname, printedname in clans:
 				p = self.ss.get_player(pname)
-				p.printedname = printedname.decode('utf-8','ignore')
-
 				c = self.ss.get_clan(cname)
 				c.save()
 				p.clan = c
