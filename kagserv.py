@@ -35,7 +35,7 @@ from random import randint
 from shutil import copy
 
 ## SET THIS ON INSTALL
-KAG_DIR = '/home/frink/kag-linux32-dedicated/'
+KAG_DIR = '/home/jadel/FrinkWeb/'
 
 path.append('frinkweb')
 
