@@ -72,8 +72,7 @@ class Banner(object):
 		# Draw Name, Rank, Kills, Deaths, KD, Favorite Weapon, Rank
 		image.paste(insignia,(width - (insignia.size[0]+2*bwidth),height/2 - insignia.size[1]/2),insignia)
 		namewidth, nameheight = self.yoster24.getsize(name)
-		maxwidth = 525 - (2*bwidth - insignia.size[0])
-		# Name
+		maxwidth = 525 - (2*bwidth + insignia.size[0])
 		fw, fh = self.yoster12.getsize(WATERMARK)
 		if oheight == 50:
 			for medalset in medals:
@@ -85,17 +84,20 @@ class Banner(object):
 						
 		else:
 			ypos+=linesize
-			medalwidth = reduce(lambda x,y:x+y.size[0]+4,medals,0)
-			xpos = (width/2) - (medalwidth/2)
+			medalwidth = reduce(lambda x,y:x+y.size[0],medals,0)
+			
 			draw.text((((width/2)-(namewidth/2))+1,4+1),name,font=self.yoster24,fill=(155,155,155)) # text shadow
 			draw.text(((width/2)-(namewidth/2),4),name,font=self.yoster24)
 			ypos += 4
+			spacing = (maxwidth - medalwidth)/(2*len(medals))
+			xpos = bwidth + spacing
 			for medalset in medals:
 				if xpos + medalset.size[0] > maxwidth:
 					ypos += linesize + 2
 					xpos = bwidth
 				image.paste(medalset, (xpos,ypos), medalset)
-				xpos += medalset.size[0] + 4
+				
+				xpos += medalset.size[0] + spacing
 			draw.text(((width/2)-(fw/2),height-16),WATERMARK,font=self.yoster12,fill=WATERMARK_COLOR)
 		
 		#draw.text((14,height-16),"Dr. Frink's FUNHOUSE",font=yoster12,fill=(136,0,0))
