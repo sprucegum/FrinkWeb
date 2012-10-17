@@ -23,6 +23,8 @@ WATERMARK = "frink.gnudist.com"
 TRIM_COLOR = '#900'
 BG_COLOR = '#400'
 WATERMARK_COLOR = (136,0,0)
+GOLD_COLOR = (0xFF,0xE1,0x00)
+GOLD_SHADOW = (0xD0,0x70,0)
 
 class Banner(object):
 	def __init__(self,name="Teste Mctesterton",kills=6432,wkills=534,dkills=140, deaths=1, gold = False):
@@ -83,8 +85,8 @@ class Banner(object):
 				xpos += medalset.size[0] + 4
 			
 			if self.gold:
-				draw.text((xpos,ypos),name,font=self.yoster24,fill=(0x70,0x70,0))
-				draw.text((xpos-1,ypos-1),name,font=self.yoster24,fill=(0xFF,0xEA,0x00))
+				draw.text((xpos,ypos),name,font=self.yoster24,fill= GOLD_SHADOW)
+				draw.text((xpos-1,ypos-1),name,font=self.yoster24,fill=GOLD_COLOR)
 			
 			else:
 				draw.text((xpos,ypos),name,font=self.yoster24,fill=(155,155,155))
@@ -98,8 +100,17 @@ class Banner(object):
 			ypos+=linesize
 			medalwidth = reduce(lambda x,y:x+y.size[0],medals,0)
 			
-			draw.text((((width/2)-(namewidth/2))+1,4+1),name,font=self.yoster24,fill=(155,155,155)) # text shadow
-			draw.text(((width/2)-(namewidth/2),4),name,font=self.yoster24)
+			if self.gold:
+				draw.text((((width/2)-(namewidth/2))+1,4+1),name,font=self.yoster24,fill= GOLD_SHADOW)
+				draw.text(((width/2)-(namewidth/2),4),name,font=self.yoster24,fill=GOLD_COLOR)
+			
+			else:
+				draw.text((((width/2)-(namewidth/2))+1,4+1),name,font=self.yoster24,fill=(155,155,155))
+				draw.text(((width/2)-(namewidth/2),4),name,font=self.yoster24,fill=(0xFF,0xFF,0xFF))
+				 
+			
+			#draw.text(,name,font=self.yoster24,fill=(155,155,155)) # text shadow
+			#draw.text(,4),name,font=self.yoster24)
 			ypos += 4
 			spacing = (maxwidth - medalwidth)/(2*len(medals))
 			xpos = bwidth + spacing
