@@ -80,6 +80,7 @@ class Banner(object):
 		maxwidth = 525 - (2*bwidth + insignia.size[0])
 		fw, fh = self.yoster12.getsize(WATERMARK)
 		if oheight == 50:
+			#if it's just one line
 			for medalset in medals:
 				image.paste(medalset,(xpos,ypos), medalset)
 				xpos += medalset.size[0] + 4
@@ -97,6 +98,7 @@ class Banner(object):
 			draw.text((xpos+2,height-16),WATERMARK,font=self.yoster12,fill=WATERMARK_COLOR)
 						
 		else:
+			#if it's multiline
 			ypos+=linesize
 			medalwidth = reduce(lambda x,y:x+y.size[0],medals,0)
 			
@@ -112,7 +114,7 @@ class Banner(object):
 			#draw.text(,name,font=self.yoster24,fill=(155,155,155)) # text shadow
 			#draw.text(,4),name,font=self.yoster24)
 			ypos += 4
-			spacing = (maxwidth - medalwidth)/(2*len(medals))
+			spacing = 8
 			xpos = bwidth + spacing
 			for medalset in medals:
 				if xpos + medalset.size[0] > maxwidth:
