@@ -53,7 +53,7 @@ class Banner(object):
 			
 	def assembleBanner(self,name,medals,insignia):
 		width, height = self.sizeBanner(name,medals,insignia)
-		oheight = 50
+		oheight = height
 		
 		bwidth = 4
 		
@@ -70,7 +70,7 @@ class Banner(object):
 		draw.rectangle([(bwidth,2*bwidth),(width-(bwidth + 1),height-2*(bwidth + 1))],fill=ImageColor.getrgb(BG_COLOR))
 		draw.rectangle([(2*bwidth,bwidth),(width-2*(bwidth + 1),height-(bwidth + 1))],fill=ImageColor.getrgb(BG_COLOR))
 		# Draw Name, Rank, Kills, Deaths, KD, Favorite Weapon, Rank
-		image.paste(insignia,((width - (insignia.size[0]+2*bwidth)),height - (bwidth+insignia.size[1])),insignia)
+		image.paste(insignia,(width - (insignia.size[0]+2*bwidth),height/2 - insignia.size[1]/2),insignia)
 		namewidth, nameheight = self.yoster24.getsize(name)
 		maxwidth = 525 - (2*bwidth - insignia.size[0])
 		# Name
