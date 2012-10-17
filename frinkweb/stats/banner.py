@@ -25,7 +25,8 @@ BG_COLOR = '#400'
 WATERMARK_COLOR = (136,0,0)
 
 class Banner(object):
-	def __init__(self,name="Teste Mctesterton",kills=6432,wkills=534,dkills=140, deaths=1):
+	def __init__(self,name="Teste Mctesterton",kills=6432,wkills=534,dkills=140, deaths=1, gold = False):
+		self.gold = gold
 		name = name.replace('_',' ')
 		# Make Fonts
 		self.yoster24 = ImageFont.truetype(KAG_DIR + 'frinkweb/stats/static/yoster.ttf',24)
@@ -47,6 +48,8 @@ class Banner(object):
 		# Draw K/D insignia
 		if deaths:
 			insignia = self.drawInsignia(kills,deaths)
+		else:
+			insignia = Image.new("RGBA",(1,1),(0,0,0,0))
 			
 		self.banner = self.assembleBanner(name,medals,insignia)
 		
@@ -78,8 +81,17 @@ class Banner(object):
 			for medalset in medals:
 				image.paste(medalset,(xpos,ypos), medalset)
 				xpos += medalset.size[0] + 4
-			draw.text((xpos+1,ypos+1),name,font=self.yoster24,fill=(155,155,155)) # text shadow
-			draw.text((xpos,ypos),name,font=self.yoster24)
+			
+			if self.gold:
+				draw.text((xpos,ypos),name,font=self.yoster24,fill=(0x70,0x70,0))
+				draw.text((xpos-1,ypos-1),name,font=self.yoster24,fill=(0xFF,0xEA,0x00))
+			
+			else:
+				draw.text((xpos,ypos),name,font=self.yoster24,fill=(155,155,155))
+				draw.text((xpos-1,ypos-1),name,font=self.yoster24,fill=(0xFF,0xFF,0xFF))
+				 
+				
+			
 			draw.text((xpos+2,height-16),WATERMARK,font=self.yoster12,fill=WATERMARK_COLOR)
 						
 		else:

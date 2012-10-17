@@ -132,7 +132,7 @@ def banner(request,player):
 	pstring = "{0} {1}".format(c,p.name)
 	wkills = p.kill_set.filter(time__gte=get_timespan('weekly')[0]).count()
 	dkills = p.kill_set.filter(time__gte=get_timespan('daily')[0]).count()
-	b = Banner(name=pstring,kills=p.kills,wkills=wkills, dkills=dkills, deaths = p.deaths)
+	b = Banner(name=pstring,kills=p.kills,wkills=wkills, dkills=dkills, deaths = p.deaths, gold = p.gold)
 	b.write(response)
 	return response
 	
