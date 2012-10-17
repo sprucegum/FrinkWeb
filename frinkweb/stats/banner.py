@@ -156,7 +156,7 @@ class Banner(object):
 			if kills >= 10000:
 				image.paste(self.m10k, (xpos, ypos),self.m10k)
 				kills -= 10000
-				xpos += 10
+				xpos += xpos + self.m10.size[0]
 			elif kills >= 5000:
 				image.paste(self.m5k, (xpos, ypos),self.m5k)
 				kills -= 5000
@@ -175,7 +175,7 @@ class Banner(object):
 			elif kills > 9:
 				image.paste(self.m10,(xpos,ypos),self.m10)
 				kills -= 10
-			xpos += 11
+			xpos += self.m10.size[0] + 1
 		return image
 		
 	def sizeMedals(self,kills):
@@ -184,7 +184,8 @@ class Banner(object):
 		while kills > 9:
 			if kills >= 10000:
 				kills -= 10000
-				xpos+=10
+				# This is necessary for the double sized medal
+				xpos += self.m10.size[0]
 			if kills >= 5000:
 				kills -= 5000
 			if kills > 999:
@@ -197,7 +198,8 @@ class Banner(object):
 				kills -= 50
 			elif kills > 9:
 				kills -= 10
-			xpos += 11
+			xpos += self.m10.size[0] + 1
+		xpos += self.m10.size[0] + 1
 		return (xpos,ypos)
 	
 	def loadImages(self):
