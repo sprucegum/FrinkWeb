@@ -106,7 +106,8 @@ class KagServer(object):
 		except:
 			return -1
 
-	def kill_server(self):	
+	def kill_server(self):
+		self.ss.close_sessions()
 		self.timer.cancel()
 		self.run_manager = False
 		self.KAG.terminate()

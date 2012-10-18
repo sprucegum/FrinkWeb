@@ -93,6 +93,11 @@ class ServerState(object):
 			except Exception as e:
 				#print e
 				return
+		
+		def close_sessions(self):
+			for sesh in self.opensessions.keys():
+				self.end_life(sesh.player.name,dtime)
+				self.close_play_session(sesh.name,dtime)
 
 		def add_life(self,pname,atime):
 			self.last_time = atime

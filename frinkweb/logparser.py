@@ -27,7 +27,7 @@ from serverstate import *
 from threading import *
 from Queue import Queue
 
-KAG_DIR = '/home/frink/FrinkWeb/'
+KAG_DIR = '/home/jadel/FrinkWeb/'
 
 
 PRINT_DEBUG = False
@@ -203,7 +203,8 @@ class LogParser(object):
 		elif re.search('''^\[.*\] WARNING: API call failed .*''',line):
 			#Shit just got real.
 			self.ss.errorstate = True
-
+		elif re.search('''^\[.*\] WARNING: A call to update the server list API .*''',line):
+			self.ss.errorstate = True
 
 
 		return line
@@ -421,8 +422,11 @@ class LogParser(object):
 		if players:
 			for player in players:
 				if PRINT_DEBUG: print player.decode('utf-8','ignore')
-				self.ss.get_player(player,known_correct=True)
-
+				p = self.ss.get_player(player,known_correct=True)
+				if self.livelog:
+					p.clan = self.ss.get_clan("NoClan")
+					p.save()
+				
 	def add_clans(self,clans):
 		if clans:
 			for pname, cname, printedname in clans:
