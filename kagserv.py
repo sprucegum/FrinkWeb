@@ -65,7 +65,9 @@ class KagServer(object):
 		self.last_stats_update = time()
 
 	def get_players(self):
-		return self.ss.pcount()
+		with open('{0}Logs/stats.txt'.format(KAG_DIR),'r') as stats:
+			return int(stats.read().split()[3])
+
 
 	def start_server(self):
 		self.ss.start_time = time()
@@ -220,7 +222,7 @@ class ProxyProcess(object):
 
 	def poll(self):
 		try:
-			self.pid = int(Popen(["ps","-C","KAGdedi","-o","pid"],stdout=PIPE).stdout.read().split()[1])
+			self.pid = int(open('Logs/pid.txt','r').readlines()[0])
 			return None
 		except:
 			return 0
