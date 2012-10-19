@@ -35,12 +35,12 @@ from random import randint
 from shutil import copy
 
 ## SET THIS ON INSTALL
-KAG_DIR = '/home/jadel/FrinkWeb/'
 
 path.append('frinkweb')
 
 from frinkweb.logparser import *
 from frinkweb.serverstate import *
+from frinkweb.settings import KAG_DIR
 ## Settings:
 
 MEMLIMIT = 200 		# megabytes, restart the server even if occupied if it hits this RAM limit.

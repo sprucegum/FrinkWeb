@@ -17,17 +17,10 @@ Copyright (C) 2012  Jade Lacosse
 
 import Image, ImageColor, ImageDraw, ImageFont
 
-
-KAG_DIR = '/home/jadel/FrinkWeb/'
-WATERMARK = "frink.gnudist.com"
-TRIM_COLOR = '#900'
-BG_COLOR = '#400'
-WATERMARK_COLOR = (136,0,0)
-GOLD_COLOR = (0xFF,0xE1,0x00)
-GOLD_SHADOW = (0xD0,0x70,0)
+from banner_settings.py import *
 
 class Banner(object):
-	def __init__(self,name="Teste Mctesterton",kills=6432,wkills=534,dkills=140, deaths=1, gold = False):
+	def __init__(self,name="Teste Mctesterton",kills=6432,wkills=534,dkills=140, deaths=3021, gold = False):
 		self.gold = gold
 		name = name.replace('_',' ')
 		# Make Fonts

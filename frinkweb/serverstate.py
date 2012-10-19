@@ -2,6 +2,7 @@ from stats.models import *
 from datetime import datetime
 from time import time
 import pickle
+from settings import KAG_DIR
 
 class ServerState(object):
 		errorstate = False
@@ -29,12 +30,12 @@ class ServerState(object):
 		def __init__(self):
 			self.birth = datetime.now()
 			
-		def save(self, fpath = './serverstate.pickle'):
+		def save(self, fpath = KAG_DIR + 'serverstate.pickle'):
 			fobject = file(fpath,'wb')
 			return pickle.dump(self,fobject)
 			
 		@classmethod
-		def load(cls, fpath = './serverstate.pickle'):
+		def load(cls, fpath = KAG_DIR + 'serverstate.pickle'):
 			fobject = file(fpath,'rb')
 			return pickle.load(fobject)
 			

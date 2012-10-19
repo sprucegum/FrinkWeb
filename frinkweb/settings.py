@@ -1,3 +1,7 @@
+# FrinkWeb Specific Constants
+
+KAG_DIR = '/home/frink/kag-linux32-dedicated/'
+
 # Django settings for frinkweb project.
 
 DEBUG = True
@@ -46,7 +50,7 @@ USE_L10N = True
 
 # Absolute path to the directory that holds media.
 # Example: "/home/media/media.lawrence.com/"
-MEDIA_ROOT = '/home/frink/kag-linux32-dedicated/frinkweb/media/'
+MEDIA_ROOT = '{0}frinkweb/media/'.format(KAG_DIR)
 
 # URL that handles the media served from MEDIA_ROOT. Make sure to use a
 # trailing slash if there is a path component (optional in other cases).
@@ -82,7 +86,7 @@ TEMPLATE_DIRS = (
     # Put strings here, like "/home/html/django_templates" or "C:/www/django/templates".
     # Always use forward slashes, even on Windows.
     # Don't forget to use absolute paths, not relative paths.
-	"/home/frink/FrinkWeb/frinkweb/stats/"
+	"{0}frinkweb/stats/".format(KAG_DIR)
 )
 
 SESSION_ENGINE= 'django.contrib.sessions.backends.cache'

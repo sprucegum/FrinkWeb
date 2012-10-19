@@ -21,18 +21,12 @@ environ['DJANGO_SETTINGS_MODULE'] = "settings"
 from shutil import move
 import re
 import settings
+from settings import KAG_DIR
 from stats.models import *
 from datetime import datetime, timedelta
 from serverstate import *
 from threading import *
 from Queue import Queue
-
-<<<<<<< HEAD
-KAG_DIR = '/home/frink/kag-linux32-dedicated/'
-=======
-KAG_DIR = '/home/jadel/FrinkWeb/'
->>>>>>> 66742f30932f3ab096c12ad4ecedae8978ad06c1
-
 
 PRINT_DEBUG = False
 
@@ -397,11 +391,11 @@ class LogParser(object):
 				if PRINT_DEBUG: print "{0[0]:22s}{0[1]:20}{0[2]:20}{0[3]:20}".format(kill)
 				#p = Player.objects.get(printedname__exact=kill[1])
 				p = self.ss.get_player(kill[1])
-				p.add_kill()
+				#p.add_kill()
 
 				#v = Player.objects.get(printedname__exact=kill[2])
 				v = self.ss.get_player(kill[2])
-				v.add_death()
+				#v.add_death()
 
 				w = self.ss.get_weapon(kill[3])
 				k = Kill(time=kill[0],player=p,victim=v,weapon=w)
@@ -467,7 +461,7 @@ class LogParser(object):
 	def query_api(self,plist):
 		#spawn a pool of threads, and pass them queue instance
 		pqueue = Queue()
-		for i in range(8):
+		for i in range(16):
 			t = KagApiQThread(pqueue)
 			t.setDaemon(True)
 			t.start()
