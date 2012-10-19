@@ -27,7 +27,7 @@ from serverstate import *
 from threading import *
 from Queue import Queue
 
-KAG_DIR = '/home/frink/FrinkWeb/'
+KAG_DIR = '/home/frink/kag-linux32-dedicated/'
 
 
 PRINT_DEBUG = False
