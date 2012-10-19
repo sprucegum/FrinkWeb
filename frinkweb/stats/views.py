@@ -149,17 +149,18 @@ def get_weapon_kills(weapon, tspan):
 				playerlist.append({'name':p.name,'kills':p.wkills,'gold':p.gold})
 		return playerlist
 	else:
-		playerlist_raw = Player.objects.filter(kill_set__time__gte=tspan, kill_set__weapon__name=weapon)
+		playerlist_raw = Player.objects.values('name','id').select_related().filter(kill_set__time__gte=tspan, kill_set__weapon__name=weapon)
 		playerlist = []
 		players_seen = []
 		for p in playerlist_raw:
-			if p.name not in players_seen:
-				weaponkills = p.kill_set.filter(time__gte=tspan).filter(weapon__name=weapon).count()
+			if p["name"] not in players_seen:
+				p = Player.objects.get(id=p["id"])
+				weaponkills = p.kill_set.values('time','weapon').filter(time__gte=tspan).filter(weapon__name=weapon).count()
 				if weaponkills:
 					try:
 						playerlist.append({'name':p.name,'kills':weaponkills,'avatar':{'large':p.avatar.large,'medium':p.avatar.medium,'small':p.avatar.small},'gold':p.gold})
 					except:
-						playerlist.append({'name':p.name,'kills':weaponkills,'gold':p.gold})
+						playerlist.append({'name':p ,'kills':weaponkills,'gold':p.gold})
 					players_seen.append(p.name)
 		playerlist = nlargest(10,playerlist,lambda x:x['kills'])
 
