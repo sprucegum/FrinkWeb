@@ -35,7 +35,7 @@ from random import randint
 from shutil import copy
 
 ## SET THIS ON INSTALL
-KAG_DIR = '/home/frink/kag-linux32-dedicated/'
+KAG_DIR = '/home/jadel/FrinkWeb/'
 
 path.append('frinkweb')
 
@@ -65,7 +65,9 @@ class KagServer(object):
 		self.last_stats_update = time()
 
 	def get_players(self):
-		return self.ss.pcount()
+		with open('{0}Logs/stats.txt'.format(KAG_DIR),'r') as stats:
+			return int(stats.read().split()[3])
+
 
 	def start_server(self):
 		self.ss.start_time = time()
@@ -106,7 +108,8 @@ class KagServer(object):
 		except:
 			return -1
 
-	def kill_server(self):	
+	def kill_server(self):
+		self.ss.close_sessions()
 		self.timer.cancel()
 		self.run_manager = False
 		self.KAG.terminate()
@@ -219,7 +222,7 @@ class ProxyProcess(object):
 
 	def poll(self):
 		try:
-			self.pid = int(Popen(["ps","-C","KAGdedi","-o","pid"],stdout=PIPE).stdout.read().split()[1])
+			self.pid = int(open('Logs/pid.txt','r').readlines()[0])
 			return None
 		except:
 			return 0

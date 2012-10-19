@@ -18,6 +18,8 @@ Copyright (C) 2012  Jade Lacosse
 from django.db import models
 import json
 import urllib2
+from django.db.models import F
+
 KAG_API = "api.kag2d.com"
 
 # Create your models here.

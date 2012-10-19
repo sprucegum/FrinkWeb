@@ -27,7 +27,11 @@ from serverstate import *
 from threading import *
 from Queue import Queue
 
+<<<<<<< HEAD
 KAG_DIR = '/home/frink/kag-linux32-dedicated/'
+=======
+KAG_DIR = '/home/jadel/FrinkWeb/'
+>>>>>>> 66742f30932f3ab096c12ad4ecedae8978ad06c1
 
 
 PRINT_DEBUG = False
@@ -153,7 +157,7 @@ class LogParser(object):
 		return line
 
 	def parse_console_line(self,line):
-		if re.search('^\[.*\] \*{1}.* connected .*',line):
+		if re.search('^\[.*\] \*{1}.* connected \(admin:.*',line):
 			# player connects
 			# [22:40:58] * chestabo connected (admin: 0 guard 0 gold 0)
 			pname = re.split('connected',line)[0].split()[2]
@@ -203,7 +207,8 @@ class LogParser(object):
 		elif re.search('''^\[.*\] WARNING: API call failed .*''',line):
 			#Shit just got real.
 			self.ss.errorstate = True
-
+		elif re.search('''^\[.*\] WARNING: A call to update the server list API .*''',line):
+			self.ss.errorstate = True
 
 
 		return line
@@ -330,9 +335,9 @@ class LogParser(object):
 		otherlines = []
 		for line in loglines:
 			try:
-				if re.search('Unnamed player is now known as',line):
+				if re.search('^\[..:..:..] Unnamed player is now known as',line):
 					players.append(re.split('Unnamed player is now known as',line.strip())[1].strip())
-				elif re.search('is now known as',line):
+				elif re.search('^\[..:..:..] [^<].* is now known as',line):
 					# to improve this algorithm, I should identify the player name by finding the
 					# text in common between the old and new name
 					clan_nameline = re.split('is now known as',line.strip())
@@ -349,7 +354,7 @@ class LogParser(object):
 		# how many disconnects
 		# ping bans, kick bans, clan membership
 
-		#self.add_players(players)
+		self.add_players(players)
 		self.add_clans(clans)
 		return otherlines
 
@@ -410,7 +415,7 @@ class LogParser(object):
 				ktime = accident[0]
 				if PRINT_DEBUG: print "{0[0]:22s}{0[1]:20}{0[2]:20}".format(accident.decode('utf-8','ignore'))
 				p = self.ss.get_player(accident[1])
-				p.add_death()
+				#p.add_death()
 				self.ss.end_life(p.name,ktime)
 				c = self.ss.get_cause(accident[2])
 				a = Accident(player = p,time = ktime,cause = c)
@@ -421,14 +426,15 @@ class LogParser(object):
 		if players:
 			for player in players:
 				if PRINT_DEBUG: print player.decode('utf-8','ignore')
-				self.ss.get_player(player)
-
+				p = self.ss.get_player(player,known_correct=True)
+				if self.livelog:
+					p.clan = self.ss.get_clan("NoClan")
+					p.save()
+				
 	def add_clans(self,clans):
 		if clans:
 			for pname, cname, printedname in clans:
 				p = self.ss.get_player(pname)
-				p.printedname = printedname.decode('utf-8','ignore')
-
 				c = self.ss.get_clan(cname)
 				c.save()
 				p.clan = c
