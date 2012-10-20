@@ -1,0 +1,259 @@
+/*********************
+*  FrinkWeb Style Sheet
+*  Text Replacement Table
+*  #900 Light Primary Color
+*  #800 Dark Primary Color
+*  #400 Table Hover
+*  #600 Table Background
+*  #520 Search Bar
+*  #910000 Search Border
+*  #FA0 Button Glow
+*  #700 Dark Background
+*********************/
+ 
+ 
+/*********************/
+/* Fonts */
+/*********************/
+@font-face
+{
+	font-family: eightbit;
+	src: url('/static/yoster.ttf');
+}
+
+/*********************/
+/* Text Style */
+/*********************/
+a {
+	color:#FFF;
+	text-decoration:none;
+}
+a:hover {
+	transition: text-shadow 0.4s;
+	-moz-transition: text-shadow 0.4s;
+	-webkit-transition: text-shadow 0.4s;
+	text-shadow:0px 0px 4px #FFF;
+}
+h1{
+	font-size:48px;
+	margin-top:0px;
+	margin-bottom:0px;
+}
+
+.gold{
+	text-shadow: 0px 0px 12px #FD0;
+	color: #FD3;
+}
+
+/*********************/
+/* Title */
+/*********************/
+#operator{
+	font-size:36px;
+}
+
+#servertitle{
+	font-size:96px;
+	text-shadow: 6px 6px #000000;
+}
+#servertitle a:hover{
+	transition: text-shadow 0.4s;
+	-moz-transition: text-shadow 0.4s;
+	-webkit-transition: text-shadow 0.4s;
+	text-shadow: 6px 6px 10px #000;
+}
+
+/*********************/
+/* Header */
+/*********************/
+.selected_tab {background-color:#900;}
+#links {
+	font-size:36px;
+	margin-bottom:0px;
+	padding-bottom:0px;
+	display:inline;
+}
+#links span{
+	padding:3px;
+	margin-left:8px;
+	margin-right:8px;
+	border:5px;
+
+}
+
+/*********************/
+/* Content */
+/*********************/
+main {
+
+	margin-left: auto;
+   	margin-right: auto;
+	
+}
+#content{
+	background-color:#900;
+}
+
+body {
+	background-color: #800;
+	font-family: eightbit;
+	font-smooth: never;
+	text-align:center;
+	color:#FFF;
+	text-shadow: 2px 2px #000000;
+}
+.player_pic {
+	max-height:24px;
+	position:relative;
+	background-color:#FFF;
+	opacity: 0.9;
+	-moz-box-shadow: 0px 0px 10px #FFF;
+	-webkit-box-shadow: 0px 0px 10px #FFF;
+	box-shadow: 0px 0px 10px #FFF;
+	border:2px solid #FFF;
+}
+
+/*********************/
+/* Tables */
+/*********************/
+.toplist {
+	font-size:36px;
+	background-color:#600;
+	padding-bottom:48px;
+	overflow-y:auto;
+	height:95%;
+	border-top-style:solid;
+	border-top-width:4px;
+	border-top-color:#600;
+	border-bottom-style:solid;
+	border-bottom-width:4px;
+	border-bottom-color:#600;
+	display:inline-table;	
+	margin-left:12px;
+	margin-right:12px;
+	margin-top:12px;
+	
+	
+}
+
+
+table {
+	table-layout:fixed;
+	background-color: #600;
+	font-size:24px;
+	margin-left: auto;
+   	margin-right: auto;
+	text-align:left;
+	border-style:none;
+	padding:2px 8px 2px 8px;
+	width:auto;
+	
+
+}
+
+thead{
+	cursor:pointer;
+}
+td{
+	padding:5px;
+	margin:4px;
+}
+tr{
+	background-color: #600;
+
+}
+
+th:hover {
+	background-color: #400;
+	transition: text-shadow 0.4s;
+	-moz-transition: text-shadow 0.4s;
+	-webkit-transition: text-shadow 0.4s;
+	text-shadow:0px 0px 4px #FFF;
+}
+
+tr:hover {
+	background-color:#400;
+	transition: background-color 0.5s;
+	-moz-transition: background-color 0.5s;
+	-webkit-transition: background-color 0.5s;
+}
+
+ul {
+	font-size:24px;
+	list-style-type: none;
+	text-shadow:none;
+	padding: 0px;
+	margin: 0px;
+	cursor: pointer;
+}
+/*********************/
+/* Search */
+/*********************/
+#psearchdiv{
+	background:#500;
+	position:fixed;
+	left:16px;
+	top:16px;
+	width: 240px;
+	text-align:left;
+	z-index:5;
+	border:4px solid #910000;
+	text-overflow:ellipsis;
+	-o-text-overflow: ellipsis;
+	-webkit-text-overflow: ellipsis;
+	white-space: nowrap;
+	overflow: hidden;
+	
+}
+input {
+	border:none;
+	font-family: eightbit;
+	background-color:#500;
+	color:#FFF;
+	font-size:24px;
+	width: 240px;
+}
+
+
+/*********************/
+/* Time Span Selector */
+/*********************/
+#timespans{
+	position: fixed;
+	left:16px;
+	bottom:36px;
+}
+.timespan{
+	color:#800;
+	font-size:24px;
+	display:inline;
+	opacity: 0.2;
+	border:8px solid #000;
+	text-shadow:none;
+	background-color:#000;
+}
+.timespan:hover{
+	transition: background-color 0.5s;
+	-webkit-transition: 0.5s;
+	opacity:1;
+	box-shadow:0 0 12px #FA0;
+	border:8px solid #FA0;
+	background-color:#FA0;
+	color:#FFF;
+}
+/******************
+ *  Fancy Scrollbar
+ ******************/
+
+::-webkit-scrollbar {
+    width: 16px;
+}
+ 
+::-webkit-scrollbar-track {
+    background: #800; 
+}
+ 
+::-webkit-scrollbar-thumb {
+    background: #700;
+}
+
