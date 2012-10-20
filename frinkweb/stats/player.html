@@ -2,7 +2,7 @@
 
 {% block style %}
 	<style type="text/css">
-		#top_players {background-color:#900;}
+		
 		#banner {
 			font-size:24px;
 			position: fixed;
@@ -41,11 +41,11 @@
 		{% if player.avatar %}<img id="avatar" class="timespan" onerror="$('#avatar').hide()" src="{{player.avatar.medium}}"></img>{% endif %}
 	<h1><a href="/clan/{{clan}}/">{{clan}}</a> <div {% if player.gold %} class="gold" {% endif %}id="pname">{{player.name}}</div></h1>
 		<div id="stats">
-			<span id="kills">
+			<span class="toplist" id="kills">
 				<span id="lkills"><a href="/player/{{player.name}}/{{timespan}}/{{pageinfo.kback}}/{{pageinfo.d}}">&lt</a></span>
 				Kills
 				<span id="mkills"><a href="/player/{{player.name}}/{{timespan}}/{{pageinfo.knext}}/{{pageinfo.d}}"%}>&gt</a></span>
-				<table>
+				<table >
 					<thead><tr><th></th><th>Victim</th><th>Weapon</th></tr></thead>
 					{% for kill in kills %}
 						<tr>
@@ -55,7 +55,7 @@
 		    		</table>
 				{{pageinfo.kpage}}/{{nk}}
 			</span>
-			<span id="deaths">
+			<span class="toplist" id="deaths">
 				<span id="ldeaths"><a  href="/player/{{player.name}}/{{timespan}}/{{pageinfo.k}}/{{pageinfo.dback}}">&lt</a></span>
 				Deaths
 				<span id="mdeaths"><a href="/player/{{player.name}}/{{timespan}}/{{pageinfo.k}}/{{pageinfo.dnext}}">&gt</a></span>

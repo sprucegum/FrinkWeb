@@ -1,11 +1,6 @@
 {% extends "frink.html" %}
 
-{% block style %}
-	<style type="text/css">
-		#top_players {background-color:#900;}
 
-	</style>
-{% endblock %}
 
 {% block javascript %}
 		<script>
@@ -16,27 +11,29 @@
 {% endblock %}
 
 {% block content %}	
-	<div class="toplist">
-		<h1>Top {{top_players.count}}{{count}}</h1>
-		<table id="top10t">
-			<thead><tr>
-				<th></th>
-				<th>Rank</th>
-				<th>Player</th>
-				<th>Kills</th>
-				<th>Deaths</th>
-				<th>K:D</th>
-			</tr></thead>
-			{% for player in top_players %}
-			<tr>
-				<td>{% if player.avatar %}<img class="player_pic" onerror="this.style.display='none'" src="{{player.avatar.small}}"></img>{% endif %}</td>
-				<td>{{forloop.counter}}</td>
-				<td><a id="{{player.name}}" {% if player.gold %} class="gold" {% endif %} href="/player/{{ player.name }}/{{timespan}}">{{ player.name }}</a></td>
-				<td>{{player.kills}}</td>
-				<td>{{player.deaths}}</td>
-				<td>{{player.kd}}</td>
-			</tr>
-			{% endfor %}
-    		</table>
+	<div id="topsection">
+		<div class="toplist">
+			<h1>Top {{top_players.count}}{{count}}</h1>
+			<table id="top10t">
+				<thead><tr>
+					<th></th>
+					<th>Rank</th>
+					<th>Player</th>
+					<th>Kills</th>
+					<th>Deaths</th>
+					<th>K:D</th>
+				</tr></thead>
+				{% for player in top_players %}
+				<tr>
+					<td>{% if player.avatar %}<img class="player_pic" onerror="this.style.display='none'" src="{{player.avatar.small}}"></img>{% endif %}</td>
+					<td>{{forloop.counter}}</td>
+					<td><a id="{{player.name}}" {% if player.gold %} class="gold" {% endif %} href="/player/{{ player.name }}/{{timespan}}">{{ player.name }}</a></td>
+					<td>{{player.kills}}</td>
+					<td>{{player.deaths}}</td>
+					<td>{{player.kd}}</td>
+				</tr>
+				{% endfor %}
+				</table>
+		</div>
 	</div>
 {% endblock %}

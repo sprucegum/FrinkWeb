@@ -1,6 +1,6 @@
 # FrinkWeb Specific Constants
 
-KAG_DIR = '/home/frink/kag-linux32-dedicated/'
+KAG_DIR = '/home/frink/frink_stats/'
 
 # Django settings for frinkweb project.
 
@@ -80,7 +80,7 @@ MIDDLEWARE_CLASSES = (
     'django.contrib.messages.middleware.MessageMiddleware',
 )
 
-ROOT_URLCONF = 'frinkweb.urls'
+ROOT_URLCONF = 'urls'
 
 TEMPLATE_DIRS = (
     # Put strings here, like "/home/html/django_templates" or "C:/www/django/templates".

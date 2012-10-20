@@ -176,7 +176,7 @@ def top_weapons(request,timespan=''):
 	cata = get_weapon_kills('catapult',tspan)
 	foot = get_weapon_kills('foot',tspan)
 
-	return render_to_response('top_weapons.html', {'hammer':hammer,'sword':sword,'bow':bow,'bomb':bomb,'catapult':cata,'foot':foot, 'timespan':timespan})
+	return render_to_response('top_weapons.html', {'top_weapons': True, 'hammer':hammer,'sword':sword,'bow':bow,'bomb':bomb,'catapult':cata,'foot':foot, 'timespan':timespan})
 
 
 def player(request, playername, kpage, dpage, timespan=''):
