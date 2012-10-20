@@ -391,11 +391,13 @@ class LogParser(object):
 				if PRINT_DEBUG: print "{0[0]:22s}{0[1]:20}{0[2]:20}{0[3]:20}".format(kill)
 				#p = Player.objects.get(printedname__exact=kill[1])
 				p = self.ss.get_player(kill[1])
-				#p.add_kill()
+				
 
 				#v = Player.objects.get(printedname__exact=kill[2])
 				v = self.ss.get_player(kill[2])
-				#v.add_death()
+				if self.livelog:
+					v.add_death()
+					p.add_kill()
 
 				w = self.ss.get_weapon(kill[3])
 				k = Kill(time=kill[0],player=p,victim=v,weapon=w)
@@ -409,7 +411,8 @@ class LogParser(object):
 				ktime = accident[0]
 				if PRINT_DEBUG: print "{0[0]:22s}{0[1]:20}{0[2]:20}".format(accident.decode('utf-8','ignore'))
 				p = self.ss.get_player(accident[1])
-				#p.add_death()
+				if self.livelog:
+					p.add_death()
 				self.ss.end_life(p.name,ktime)
 				c = self.ss.get_cause(accident[2])
 				a = Accident(player = p,time = ktime,cause = c)
@@ -453,10 +456,10 @@ class LogParser(object):
 
 	def calculate_kds(self):
 		for pname,player in self.ss.players.iteritems():
-			player.update_kd()
+			player.update_kd(live=False)
 
 		for cname,clan in self.ss.clans.iteritems():
-			clan.update_kd()
+			clan.update_kd(live=False)
 
 	def query_api(self,plist):
 		#spawn a pool of threads, and pass them queue instance

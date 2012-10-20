@@ -18,7 +18,11 @@ Copyright (C) 2012  Jade Lacosse
 from django.db import models
 import json
 import urllib2
-from django.db.models import F
+from django.db.models import F, Sum
+
+from sys import path
+path.append('../')
+from settings import KAG_DIR
 
 KAG_API = "api.kag2d.com"
 
@@ -57,7 +61,10 @@ class Player(models.Model):
 		if self.clan:
 			self.clan.add_death()
 
-	def update_kd(self):
+	def update_kd(self, live = True):
+		if not live:
+			self.kills = self.kill_set.count()
+			self.deaths = self.death_set.count() + self.accident_set.count()
 		if (self.deaths>10):
 			self.kd = str(self.kills/float(self.deaths))
 		self.save()
@@ -85,7 +92,8 @@ class Player(models.Model):
 			self.save()
 		except:
 			return
-
+	
+			
 	def __unicode__(self):
 		return self.name
 
@@ -114,8 +122,8 @@ class Collapse(models.Model):
 class Kill(models.Model):
 	player = models.ForeignKey(Player, related_name = 'kill_set')
 	victim = models.ForeignKey(Player, related_name = 'death_set')
-	weapon = models.ForeignKey('Weapon')
-	time = models.DateTimeField()
+	weapon = models.ForeignKey('Weapon',db_index=True)
+	time = models.DateTimeField(db_index=True)
 	def __unicode__(self):
 		return "{0} {1} killed {2} with {3}".format(self.time,self.player,self.victim,self.weapon)
 
@@ -141,10 +149,16 @@ class Clan(models.Model):
 		self.deaths += 1
 		self.save()
 
-	def update_kd(self):
+	def update_kd(self, live = True):
+		if not live:
+			self.kills = self.player_set.aggregate(Sum('kills'))['kills__sum']
+			self.deaths = self.player_set.aggregate(Sum('deaths'))['deaths__sum']
+			if not self.kills: self.kills = 0
+			if not self.deaths: self.deaths = 0
+
 		if (self.deaths>10):
 			self.kd = str(self.kills/float(self.deaths))
-		self.save()
+			self.save()
 	
 	def update_members(self):
 		self.members = self.player_set.count()

@@ -17,7 +17,7 @@ Copyright (C) 2012  Jade Lacosse
 
 import Image, ImageColor, ImageDraw, ImageFont
 
-from banner_settings.py import *
+from banner_settings import *
 
 class Banner(object):
 	def __init__(self,name="Teste Mctesterton",kills=6432,wkills=534,dkills=140, deaths=3021, gold = False):
