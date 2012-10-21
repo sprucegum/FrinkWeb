@@ -27,6 +27,7 @@ from datetime import datetime, timedelta
 from serverstate import *
 from threading import *
 from Queue import Queue
+from numpy import linalg, histogram
 
 PRINT_DEBUG = False
 
@@ -86,8 +87,8 @@ class LogParser(object):
 	def process_database(self):
 		self.calculate_kds()
 		self.count_clanmembers()
-		if not self.livelog:
-			self.query_api(self.ss.known_players())
+		#if not self.livelog:
+		#	self.query_api(self.ss.known_players())
 
 	def get_logs(self):
 		chats = filter(lambda line:line.count("chat"),walk(KAG_DIR + 'Logs').next()[2])
@@ -460,6 +461,46 @@ class LogParser(object):
 
 		for cname,clan in self.ss.clans.iteritems():
 			clan.update_kd(live=False)
+
+	def build_top_tables(self):
+		top_cat, new_cat = TopCategory.objects.get_or_create(name="top50_players",title="Top Players")
+		top_cat.save()
+		TopTable.objects.all().delete()
+		top_table, new_table = TopTable.objects.get_or_create(start = datetime.min, end=datetime.now(), last_update=datetime.now(), category=top_cat)
+		top_table.save()
+		rank = 0
+		top_players = Player.objects.all().order_by('-kills')
+		frink_matrix = self.solve_player_set(top_players)
+		max_frink = max(frink_matrix)
+		min_frink = min(frink_matrix)
+		TopEntry.objects.filter(table=top_table).delete()
+		for player in top_players:
+			#print "{0:.8}".format(frink_matrix[rank])
+			top_entry = TopEntry(player=player,rank=rank, table=top_table, kills = player.kills, deaths=player.deaths)
+			top_entry.frinkrank = str((frink_matrix[rank] - min_frink)/(max_frink-min_frink))
+			top_entry.save()
+			rank += 1
+	
+	def kill_matrix(self,player_set):
+		kill_matrix = []
+		for player_index in range(player_set.count()):
+			print player_set[player_index].name
+			kill_row = [0] * player_set.count()
+			for victimid in player_set[player_index].kill_set.all().values_list('victim',flat=True):
+				kill_row[victimid -1] += 1
+			kill_row[player_index] = -1
+			kill_matrix.append(kill_row)
+		life_matrix = [0] * len(player_set)
+		for kill_row in kill_matrix:
+			for index in range(len(kill_row)):
+				life_matrix[index] += kill_row[index]
+		return (kill_matrix,life_matrix)
+	
+	def solve_player_set(self,player_set):
+		km, lm = self.kill_matrix(player_set)
+		soln = linalg.solve(km,lm)
+		return soln
+
 
 	def query_api(self,plist):
 		#spawn a pool of threads, and pass them queue instance

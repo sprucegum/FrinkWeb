@@ -1,5 +1,7 @@
 import json
-KAG_DIR = '/home/frink/kag-linux32-dedicated/'
+from sys import path
+path.append('../')
+from settings import KAG_DIR
 class BlackList(object):
 	def __init__(self):
 		banfile = open(KAG_DIR + '/Base/Security/blacklist.cfg')

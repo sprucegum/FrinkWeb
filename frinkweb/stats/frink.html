@@ -31,6 +31,9 @@
 					},
 					appendTo:"#psearchdiv"
 				});
+				$("#psearch").click(function(){
+						this.value = ""
+				});
 			});
 			function fadein(){
 				$('#loading').animate({'opacity':1.0},1000,function(){fadeout()})
@@ -77,7 +80,7 @@
 	<BODY>
 		<div id="main">
 			<div id="psearchdiv">
-				<div class="ui-widget"><input id="psearch" name="psearch"></div>
+				<div class="ui-widget"><input id="psearch" name="psearch" value="Search"></div>
 				<div id="playernames"></div>
 			</div>
 

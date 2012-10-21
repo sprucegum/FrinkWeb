@@ -23,8 +23,9 @@ from datetime import datetime, timedelta
 from banner import Banner
 from django.http import HttpResponse
 from blacklist import *
-from heapq import nlargest
+from heapq import nlargest 
 import json
+
 
 def get_timespan(timespan):
 	tspan = datetime.now()
@@ -41,15 +42,40 @@ def get_timespan(timespan):
 		return (None, timespan)
 	return (tspan, timespan)
 
-def top_players(request,timespan=''):
+def top_players(request,timespan='all'):
+	'''
 	tspan, timespan = get_timespan(timespan)
+	top = []
 	if not tspan:	
 		top_players = Player.objects.all().order_by('-kills')[0:50]
-		return render_to_response('top_players.html', {'top_players': top_players,'timespan':'all'})
+		for player in top_players:
+			try:
+				top.append({'name':player.name,'kills':player.kills,'deaths':player.deaths,'kd':player.kd,'avatar':{'large':player.avatar.large,'medium':player.avatar.medium,'small':player.avatar.small},'gold':player.gold})
+			except:
+				top.append({'name':player.name,'kills':player.kills,'deaths':player.deaths,'kd':player.kd,'gold':player.gold})
+		if top_players.count() > 4:
+			frink_matrix = solve_player_set(top_players)
+			for index in range(len(frink_matrix)):
+				top[index]["frinkrank"] = frink_matrix[index]
+		return render_to_response('top_players.html', {'top_players': top,'timespan':'all'})
 
 	top_players = Player.objects.filter(kill_set__time__gte=tspan).annotate(skills=Count('kill_set')).order_by('-skills')[0:50]
+	'''
+	top_cat = TopCategory.objects.get(name="top50_players",title="Top Players")
+	top_table = TopTable.objects.get(category=top_cat)
+	top_player_entries = TopEntry.objects.filter(table=top_table).order_by('-frinkrank')
+	top_player_entries_sorted = sorted(top_player_entries, lambda x,y:y.kills-x.kills)
+	n_players = top_player_entries.count()
 	top = []
-	
+	for entry in top_player_entries_sorted:
+		kd = 0
+		if entry.deaths:
+			kd = "{0:.2}".format(float(entry.kills)/entry.deaths)
+		try:
+			top.append({'name':entry.player.name,'kills':entry.kills,'deaths':entry.deaths,'kd':kd,'avatar':{'large':entry.player.avatar.large,'medium':entry.player.avatar.medium,'small':entry.player.avatar.small},'gold':entry.player.gold})
+		except:
+			top.append({'name':entry.player.name,'kills':entry.kills,'deaths':entry.deaths,'kd':kd,'gold':entry.player.gold})
+	'''
 	for player in top_players:
 		kills = player.kill_set.filter(time__gte=tspan).count()
 		deaths = player.death_set.filter(time__gte=tspan).count()
@@ -63,8 +89,13 @@ def top_players(request,timespan=''):
 			top.append({'name':player.name,'kills':kills,'deaths':deaths,'kd':kd,'avatar':{'large':player.avatar.large,'medium':player.avatar.medium,'small':player.avatar.small},'gold':player.gold})
 		except:
 			top.append({'name':player.name,'kills':kills,'deaths':deaths,'kd':kd,'gold':player.gold})
+	if top_players.count() > 5:
+		frink_matrix = solve_player_set(top_players)
+		for index in range(len(frink_matrix)):
+			top[index]["frinkrank"] = frink_matrix[index]
+	'''
+	return render_to_response('top_players.html', {'top_players': top, 'count':n_players, 'timespan':timespan})
 
-	return render_to_response('top_players.html', {'top_players': top, 'count':top_players.count(), 'timespan':timespan})
 
 def top_clans(request,timespan=''):
 	tspan, timespan = get_timespan(timespan)

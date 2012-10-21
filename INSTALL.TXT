@@ -1,14 +1,9 @@
 # To install Frink Stats, extract the archive into your KAG server directory. #
 
 ## THE FOLLOWING FILES NEED TO BE CONFIGURED MANUALLY!
-kagserv.py
-frinkweb/settings.py
-frinkweb/logparser.py
-frinkweb/stats/player.html
-frinkweb/stats/clan.html
-frinkweb/stats/banner.py
-frinkweb/stats/frink.html
-frinkweb/stats/etc/sites-available/frink.conf
+kagserv.py											# Change memory limit
+frinkweb/settings.py								# Change KAG DIR
+frinkweb/stats/etc/sites-available/frink.conf		# Change Static folder
 
 ## ALSO, YOU'LL NEED TO ENABLE cc_killfeed = 1 TO Base/Scripts/dedicated_autoconfig.gm
 

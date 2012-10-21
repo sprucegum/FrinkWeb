@@ -120,8 +120,8 @@ class Collapse(models.Model):
 		return self.player
 
 class Kill(models.Model):
-	player = models.ForeignKey(Player, related_name = 'kill_set')
-	victim = models.ForeignKey(Player, related_name = 'death_set')
+	player = models.ForeignKey(Player, related_name = 'kill_set',db_index=True)
+	victim = models.ForeignKey(Player, related_name = 'death_set',db_index=True)
 	weapon = models.ForeignKey('Weapon',db_index=True)
 	time = models.DateTimeField(db_index=True)
 	def __unicode__(self):
@@ -180,22 +180,25 @@ class Cause(models.Model):
 		
 class TopCategory(models.Model):
 	name = models.CharField(max_length=80)
+	title = models.CharField(max_length=80)
 	def __unicode__(self):
 		return self.name
 		
 class TopTable(models.Model):
 	start = models.DateTimeField()
 	end = models.DateTimeField()
+	last_update = models.DateTimeField()
 	category = models.ForeignKey(TopCategory)
 	def __unicode__(self):
 		return self.category
 		
 class TopEntry(models.Model):
 	player = models.ForeignKey(Player)
-	rank = models.IntegerField(default=0)
+	rank = models.IntegerField(default=0,db_index=True)
 	table = models.ForeignKey(TopTable)
 	kills = models.IntegerField(default=0)
 	deaths = models.IntegerField(default=0)
+	frinkrank = models.DecimalField(decimal_places=2,max_digits=15,default="0.0")
 	def __unicode__(self):
 		return self.player
 
