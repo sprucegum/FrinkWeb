@@ -22,7 +22,7 @@
 					<th>Kills</th>
 					<th>Deaths</th>
 					<th>K:D</th>
-
+					<th>FR</th>
 				</tr></thead>
 				{% for player in top_players %}
 				<tr>
@@ -32,6 +32,7 @@
 					<td>{{player.kills}}</td>
 					<td>{{player.deaths}}</td>
 					<td>{{player.kd}}</td>
+					<td>{{player.frinkrank}}</td>
 				</tr>
 				{% endfor %}
 				</table>

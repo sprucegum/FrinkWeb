@@ -63,18 +63,17 @@ def top_players(request,timespan='all'):
 	'''
 	top_cat = TopCategory.objects.get(name="top50_players",title="Top Players")
 	top_table = TopTable.objects.get(category=top_cat)
-	top_player_entries = TopEntry.objects.filter(table=top_table).order_by('-frinkrank')
-	top_player_entries_sorted = sorted(top_player_entries, lambda x,y:y.kills-x.kills)
+	top_player_entries = TopEntry.objects.filter(table=top_table).order_by('rank')[0:50]
 	n_players = top_player_entries.count()
 	top = []
-	for entry in top_player_entries_sorted:
+	for entry in top_player_entries:
 		kd = 0
 		if entry.deaths:
 			kd = "{0:.2}".format(float(entry.kills)/entry.deaths)
 		try:
-			top.append({'name':entry.player.name,'kills':entry.kills,'deaths':entry.deaths,'kd':kd,'avatar':{'large':entry.player.avatar.large,'medium':entry.player.avatar.medium,'small':entry.player.avatar.small},'gold':entry.player.gold})
+			top.append({'frinkrank':entry.frinkrank,'name':entry.player.name,'kills':entry.kills,'deaths':entry.deaths,'kd':kd,'avatar':{'large':entry.player.avatar.large,'medium':entry.player.avatar.medium,'small':entry.player.avatar.small},'gold':entry.player.gold})
 		except:
-			top.append({'name':entry.player.name,'kills':entry.kills,'deaths':entry.deaths,'kd':kd,'gold':entry.player.gold})
+			top.append({'frinkrank':entry.frinkrank,'name':entry.player.name,'kills':entry.kills,'deaths':entry.deaths,'kd':kd,'gold':entry.player.gold})
 	'''
 	for player in top_players:
 		kills = player.kill_set.filter(time__gte=tspan).count()

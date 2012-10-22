@@ -27,7 +27,7 @@ from datetime import datetime, timedelta
 from serverstate import *
 from threading import *
 from Queue import Queue
-from numpy import linalg, histogram
+from numpy import linalg, histogram,ma
 
 PRINT_DEBUG = False
 
@@ -463,6 +463,7 @@ class LogParser(object):
 			clan.update_kd(live=False)
 
 	def build_top_tables(self):
+		start_time = datetime.now()
 		top_cat, new_cat = TopCategory.objects.get_or_create(name="top50_players",title="Top Players")
 		top_cat.save()
 		TopTable.objects.all().delete()
@@ -471,23 +472,33 @@ class LogParser(object):
 		rank = 0
 		top_players = Player.objects.all().order_by('-kills')
 		frink_matrix = self.solve_player_set(top_players)
-		max_frink = max(frink_matrix)
-		min_frink = min(frink_matrix)
+		
+		print (datetime.now()-start_time)
+		start_time = datetime.now()
+		print "updating database"
 		TopEntry.objects.filter(table=top_table).delete()
 		for player in top_players:
 			#print "{0:.8}".format(frink_matrix[rank])
 			top_entry = TopEntry(player=player,rank=rank, table=top_table, kills = player.kills, deaths=player.deaths)
-			top_entry.frinkrank = str((frink_matrix[rank] - min_frink)/(max_frink-min_frink))
+			if player.deaths:
+				top_entry.frinkrank = str((float(frink_matrix[rank])/float(player.deaths)) + float(player.kills)/float(player.deaths))
 			top_entry.save()
 			rank += 1
+		print (datetime.now()-start_time)
 	
 	def kill_matrix(self,player_set):
+		print "building {0} player kill matrix".format(player_set.count())
 		kill_matrix = []
+		self.id_list = []
+		for p in player_set:
+			self.id_list.append(p.id)
+			
 		for player_index in range(player_set.count()):
 			print player_set[player_index].name
 			kill_row = [0] * player_set.count()
 			for victimid in player_set[player_index].kill_set.all().values_list('victim',flat=True):
-				kill_row[victimid -1] += 1
+				#print victimid
+				kill_row[self.id_list.index(victimid)] += 1
 			kill_row[player_index] = -1
 			kill_matrix.append(kill_row)
 		life_matrix = [0] * len(player_set)
@@ -495,12 +506,49 @@ class LogParser(object):
 			for index in range(len(kill_row)):
 				life_matrix[index] += kill_row[index]
 		return (kill_matrix,life_matrix)
+		
+	def find_competitors(self,kill_matrix,pivot_index, competitor_set = set()):
+		competitor_set.add(pivot_index)
+		pivot_row = kill_matrix[pivot_index]
+		search_list = []
+		for index in range(len(pivot_row)):
+			if pivot_row[index] > 0:
+				if index not in competitor_set:
+					competitor_set = self.find_competitors(kill_matrix,index,competitor_set)
+		return competitor_set
+					
+	
+	def shrink_matrix(self,kill_matrix,life_matrix, cset):
+		print "shrinking matrix"
+		small_matrix = []
+		small_life = []
+		for player_index in cset:
+			small_life.append(life_matrix[player_index])
+			row_matrix = []
+			for victim_index in cset:
+				row_matrix.append(kill_matrix[player_index][victim_index])
+			small_matrix.append(row_matrix)
+		return small_matrix, small_life
+				
+	def grow_list(self,rank_list,cset,sol_length):
+		ranks = [0] * sol_length
+		rlist = rank_list.tolist()
+		for index in cset:
+			ranks[index] = rlist.pop(0)
+		return ranks
 	
 	def solve_player_set(self,player_set):
 		km, lm = self.kill_matrix(player_set)
+		print "finding competitors"
+		cset = self.find_competitors(km,0)
+		cset = list(cset)
+		cset = sorted(cset)
+		#print "isolating competitors"
+		#km,lm = self.isolate_competitors(km,lm,cset)
+		km,lm = self.shrink_matrix(km,lm,cset)
+		print "solving equation"
 		soln = linalg.solve(km,lm)
-		return soln
-
+		return self.grow_list(soln,cset,player_set.count())
 
 	def query_api(self,plist):
 		#spawn a pool of threads, and pass them queue instance
