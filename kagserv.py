@@ -109,14 +109,14 @@ class KagServer(object):
 			return -1
 
 	def kill_server(self):
-		self.ss.close_sessions()
+		self.ss.server_stop()
 		self.timer.cancel()
 		self.run_manager = False
 		self.KAG.terminate()
 	
 	def restart_server(self):
 		self.rotate_map()
-		self.ss.restarts += 1
+		self.ss.restart_server()
 		lp = self.parse_live()
 		if lp:
 			lp.close_livelog()
