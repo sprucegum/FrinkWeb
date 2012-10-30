@@ -66,8 +66,7 @@ class KagServer(object):
 		self.last_stats_update = time()
 
 	def get_players(self):
-		with open('{0}Logs/stats.txt'.format(KAG_DIR),'r') as stats:
-			return int(stats.read().split()[3])
+		return self.ss.pcount()
 
 
 	def start_server(self):
