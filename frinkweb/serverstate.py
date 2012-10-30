@@ -36,8 +36,14 @@ class ServerState(object):
 			
 		@classmethod
 		def load(cls, fpath = './serverstate.pickle'):
-			fobject = file(fpath,'rb')
-			return pickle.load(fobject)
+			try:
+				print "Loading server state"
+				fobject = file(fpath,'rb')
+				return pickle.load(fobject)
+			except:
+				print "Failed to load state, creating new server state object"
+				return ServerState()
+			
 			
 		def pset(self):
 			pset = []
@@ -58,7 +64,7 @@ class ServerState(object):
 			
 		def server_stop(self):
 			self.end_match(self.last_time)
-			self.close_sessions()
+			self.close_sessions(self.last_time)
 
 		# Some Processing code.
 		def start_match(self,dtime):
@@ -101,7 +107,9 @@ class ServerState(object):
 				#print e
 				return
 		
-		def close_sessions(self):
+		def close_sessions(self,dtime=None):
+			if not dtime:
+				dtime = self.last_time
 			for sesh in self.opensessions.keys():
 				self.end_life(sesh,dtime)
 				self.close_play_session(sesh,dtime)
@@ -131,6 +139,8 @@ class ServerState(object):
 			if pname in self.players:
 				return self.players[pname]
 			elif known_correct:
+				# If this is an initial connect message, then we know the players name.
+				# So, we should just be able to look the player up, or create a new player.
 				try:
 					p = Player.objects.get(name=pname)
 					self.players[pname] = p
@@ -143,9 +153,16 @@ class ServerState(object):
 						print pname + ':' + p.name
 						return p
 			else:
+				# If this is a chat, or kill message. The Clan name needs to be seperated from the player name
+				# We can safely assume that we've seen the players proper name once already, so they are in the player list.
 				for pkey in sorted(filter(lambda x: len(x)<len(pname),self.players.keys()),cmp=lambda x,y:cmp(len(y),len(x))):
+					# Let's take all the player names that are equal to, or less than, the Clan+player name.
+					# We'll sort the names from largest to smallest, and the first name to fit on the end of the string,
+					# should be proper name of the player name that we are looking for.
 					if pname.endswith(pkey):
+						# first, let's make a note of this name mapping, so we don't have to repeat this process.
 						self.players[pname] = self.players[pkey]
+						# now, we return the player object.
 						p = self.players[pkey]
 						print pname + ':' + p.name
 						return p

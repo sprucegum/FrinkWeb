@@ -48,6 +48,7 @@ RESTART_PERIOD = 20 	# minutes, minimum time between restarts
 POLL_PERIOD = 10	# seconds, how often to see how many people are playing, perform logic.
 UPDATE_PERIOD = 30	# minutes, how often to check for updates.
 STATS_PERIOD = 10	# seconds, how often to update stats.
+ROTATE_MAPS = True
 
 class KagServer(object):
 	def __init__(self):
@@ -115,14 +116,15 @@ class KagServer(object):
 		self.KAG.terminate()
 	
 	def restart_server(self):
-		self.rotate_map()
-		self.ss.restart_server()
-		lp = self.parse_live()
-		if lp:
-			lp.close_livelog()
-			lp = None
-		self.kill_server()
-		self.KAG = self.start_server()
+		if ROTATE_MAPS:
+			self.rotate_map()
+			self.ss.server_restart()
+			lp = self.parse_live()
+			if lp:
+				lp.close_livelog()
+				lp = None
+			self.kill_server()
+			self.KAG = self.start_server()
 		
 	
 	def parse_old(self):

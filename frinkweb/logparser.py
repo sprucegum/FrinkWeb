@@ -29,6 +29,7 @@ from threading import *
 from Queue import Queue
 
 PRINT_DEBUG = False
+LOG_CHATS = True
 
 class LogParser(object):
 
@@ -374,11 +375,6 @@ class LogParser(object):
 					int(hour),
 					int(minute),
 					int(second))+timedelta(days=(self.ss.days + dmod)))
-		'''
-		except Exception as e:
-			print logtime
-			print e
-		'''
 
 
 
@@ -438,17 +434,18 @@ class LogParser(object):
 				p.save()
 
 	def add_chats(self,chats):
-		for line in chats:
-			if PRINT_DEBUG: print line
-			ts = self.parse_time(line.split()[0])
-			pname = re.search('(<.*?>)',line).groups()[0].strip('<>')
-			if pname is '':
-				pname = re.search('(<.*>)',line).groups()[0].strip('<>')
-			message = re.split('<.*?>',line)[1].decode('utf-8','ignore').strip()
-			p = self.ss.get_player(pname)
-			if p:
-				c = Chat(player=p,time=ts,text=message)
-				c.save()
+		if LOG_CHATS:
+			for line in chats:
+				if PRINT_DEBUG: print line
+				ts = self.parse_time(line.split()[0])
+				pname = re.search('(<.*?>)',line).groups()[0].strip('<>')
+				if pname is '':
+					pname = re.search('(<.*>)',line).groups()[0].strip('<>')
+				message = re.split('<.*?>',line)[1].decode('utf-8','ignore').strip()
+				p = self.ss.get_player(pname)
+				if p:
+					c = Chat(player=p,time=ts,text=message)
+					c.save()
 
 	def first_run(self):
 		clan, created = Clan.objects.get_or_create(name="NoClan")
