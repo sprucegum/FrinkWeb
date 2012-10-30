@@ -180,12 +180,15 @@ class Cause(models.Model):
 		
 class TopCategory(models.Model):
 	name = models.CharField(max_length=80)
+	title = models.CharField(max_length=80)
 	def __unicode__(self):
 		return self.name
 		
 class TopTable(models.Model):
+	tag = models.CharField(max_length=32)
 	start = models.DateTimeField()
 	end = models.DateTimeField()
+	last_update = models.DateTimeField()
 	category = models.ForeignKey(TopCategory)
 	def __unicode__(self):
 		return self.category
