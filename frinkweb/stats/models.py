@@ -198,7 +198,6 @@ class TopEntry(models.Model):
 	table = models.ForeignKey(TopTable)
 	kills = models.IntegerField(default=0,db_index=True)
 	deaths = models.IntegerField(default=0)
-	frinkrank = models.DecimalField(decimal_places=2,max_digits=15,default="0.0",db_index=True)
 	def __unicode__(self):
 		return self.player
 

@@ -4,13 +4,15 @@ from django.conf.urls.defaults import *
 # from django.contrib import admin
 # admin.autodiscover()
 
+#Sentinel:C&p addition (kills_json)
 urlpatterns = patterns('',
 	url(r'^(?P<timespan>(hourly|daily|weekly|all)?)/?$', 'stats.views.top_players'),
 	url(r'^top_players/?(?P<timespan>(hourly|daily|weekly|all)?)/?$', 'stats.views.top_players'),
 	url(r'^top_clans/?(?P<timespan>(hourly|daily|weekly|all)?)/?$', 'stats.views.top_clans'),
 	url(r'^top_weapons/?(?P<timespan>(hourly|daily|weekly|all)?/?).*$', 'stats.views.top_weapons'),
 	url(r'^player/(?P<player>[0-9a-zA-Z-_\.]+).png$', 'stats.views.banner'),
-	url(r'^player/(?P<playername>[0-9a-zA-Z-_\.]+)/?(?P<timespan>(hourly|daily|weekly|all)?)/?(?P<kpage>\d*)/?(?P<dpage>\d*)/?$', 'stats.views.player'),
+	url(r'^player/(?P<playername>[0-9a-zA-Z-_\.]+).json$', 'stats.views.player_json'),
+ 	url(r'^player/(?P<playername>[0-9a-zA-Z-_\.]+)/?(?P<timespan>(hourly|daily|weekly|all)?)/?(?P<kpage>\d*)/?(?P<dpage>\d*)/?$', 'stats.views.player_html'),
 	url(r'^playersearch.*$', 'stats.views.player_search'),
 	url(r'^clan/(?P<clanname>[\[\]\!0-9a-zA-Z-_]+)/?(?P<timespan>(hourly|daily|weekly|all)?)/?$', 'stats.views.clan'),
 	url(r'^blacklist.*$','stats.views.blacklist'),

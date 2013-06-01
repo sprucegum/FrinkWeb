@@ -30,12 +30,12 @@ class ServerState(object):
 		def __init__(self):
 			self.birth = datetime.now()
 			
-		def save(self, fpath = KAG_DIR + 'serverstate.pickle'):
+		def save(self, fpath = './serverstate.pickle'):
 			fobject = file(fpath,'wb')
 			return pickle.dump(self,fobject)
 			
 		@classmethod
-		def load(cls, fpath = KAG_DIR + 'serverstate.pickle'):
+		def load(cls, fpath = './serverstate.pickle'):
 			fobject = file(fpath,'rb')
 			return pickle.load(fobject)
 			
@@ -52,14 +52,20 @@ class ServerState(object):
 			return len(self.opensessions)
 
 		def server_restart(self):
+			self.restarts +=1
 			self.end_match(self.last_time)
+			self.close_sessions(self.last_time)
+			
+		def server_stop(self):
+			self.end_match(self.last_time)
+			self.close_sessions(self.last_time)
 
 		# Some Processing code.
 		def start_match(self,dtime):
 			self.last_time = dtime
 			self.matchover = False
 			for sesh in self.opensessions.keys():
-				self.add_life(sesh.player.name,dtime)
+				self.add_life(sesh,dtime)
 
 		def end_match(self,dtime):
 			self.last_time = dtime
@@ -95,10 +101,10 @@ class ServerState(object):
 				#print e
 				return
 		
-		def close_sessions(self):
+		def close_sessions(self,dtime):
 			for sesh in self.opensessions.keys():
-				self.end_life(sesh.player.name,dtime)
-				self.close_play_session(sesh.name,dtime)
+				self.end_life(sesh,dtime)
+				self.close_play_session(sesh,dtime)
 
 		def add_life(self,pname,atime):
 			self.last_time = atime

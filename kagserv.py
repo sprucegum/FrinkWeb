@@ -46,7 +46,7 @@ from frinkweb.settings import KAG_DIR
 MEMLIMIT = 200 		# megabytes, restart the server even if occupied if it hits this RAM limit.
 RESTART_PERIOD = 20 	# minutes, minimum time between restarts 
 POLL_PERIOD = 10	# seconds, how often to see how many people are playing, perform logic.
-UPDATE_PERIOD = 30	# minutes, how often to check for updates.
+UPDATE_PERIOD = 30	# minutes, how often to check for KAG updates.
 STATS_PERIOD = 10	# seconds, how often to update stats.
 ROTATE_MAPS = True
 

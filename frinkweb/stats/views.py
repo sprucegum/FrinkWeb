@@ -43,24 +43,7 @@ def get_timespan(timespan):
 	return (tspan, timespan)
 
 def top_players(request,timespan='all'):
-	'''
-	tspan, timespan = get_timespan(timespan)
-	top = []
-	if not tspan:	
-		top_players = Player.objects.all().order_by('-kills')[0:50]
-		for player in top_players:
-			try:
-				top.append({'name':player.name,'kills':player.kills,'deaths':player.deaths,'kd':player.kd,'avatar':{'large':player.avatar.large,'medium':player.avatar.medium,'small':player.avatar.small},'gold':player.gold})
-			except:
-				top.append({'name':player.name,'kills':player.kills,'deaths':player.deaths,'kd':player.kd,'gold':player.gold})
-		if top_players.count() > 4:
-			frink_matrix = solve_player_set(top_players)
-			for index in range(len(frink_matrix)):
-				top[index]["frinkrank"] = frink_matrix[index]
-		return render_to_response('top_players.html', {'top_players': top,'timespan':'all'})
 
-	top_players = Player.objects.filter(kill_set__time__gte=tspan).annotate(skills=Count('kill_set')).order_by('-skills')[0:50]
-	'''
 	top_cat = TopCategory.objects.get(name="top50_players",title="Top Players")
 	top_table = TopTable.objects.get(category=top_cat)
 	top_player_entries = TopEntry.objects.filter(table=top_table).order_by('rank')[0:50]
@@ -71,28 +54,10 @@ def top_players(request,timespan='all'):
 		if entry.deaths:
 			kd = "{0:.2}".format(float(entry.kills)/entry.deaths)
 		try:
-			top.append({'frinkrank':entry.frinkrank,'name':entry.player.name,'kills':entry.kills,'deaths':entry.deaths,'kd':kd,'avatar':{'large':entry.player.avatar.large,'medium':entry.player.avatar.medium,'small':entry.player.avatar.small},'gold':entry.player.gold})
+			top.append({'name':entry.player.name,'kills':entry.kills,'deaths':entry.deaths,'kd':kd,'avatar':{'large':entry.player.avatar.large,'medium':entry.player.avatar.medium,'small':entry.player.avatar.small},'gold':entry.player.gold})
 		except:
-			top.append({'frinkrank':entry.frinkrank,'name':entry.player.name,'kills':entry.kills,'deaths':entry.deaths,'kd':kd,'gold':entry.player.gold})
-	'''
-	for player in top_players:
-		kills = player.kill_set.filter(time__gte=tspan).count()
-		deaths = player.death_set.filter(time__gte=tspan).count()
-		
-		if deaths: 
-			kd = '{0:.3}'.format(float(kills)/float(deaths))
-		else: 
-			kd = 0
-			
-		try:
-			top.append({'name':player.name,'kills':kills,'deaths':deaths,'kd':kd,'avatar':{'large':player.avatar.large,'medium':player.avatar.medium,'small':player.avatar.small},'gold':player.gold})
-		except:
-			top.append({'name':player.name,'kills':kills,'deaths':deaths,'kd':kd,'gold':player.gold})
-	if top_players.count() > 5:
-		frink_matrix = solve_player_set(top_players)
-		for index in range(len(frink_matrix)):
-			top[index]["frinkrank"] = frink_matrix[index]
-	'''
+			top.append({'name':entry.player.name,'kills':entry.kills,'deaths':entry.deaths,'kd':kd,'gold':entry.player.gold})
+	
 	return render_to_response('top_players.html', {'top_players': top, 'count':n_players, 'timespan':timespan})
 
 
@@ -245,8 +210,54 @@ def player(request, playername, kpage, dpage, timespan=''):
 	prefix = '/player/{0}/'.format(p.name)
 	postfix = '/{0}/{1}'.format(kpage,dpage)
 	page = {'kpage':kpage*10,'dpage':dpage*10,'knext':kpage+1,'dnext':dpage+1,'kback':max(kpage-1,0),'dback':max(dpage-1,0),'k':kpage,'d':dpage}
+	return {'player': p,'clan':c,'kills':kills,'deaths':deaths,'pageinfo':page, 'timespan':timespan, 'nk':nk, 'nd':nd, 'prefix':prefix,'postfix':postfix}
+	
 
-	return render_to_response('player.html', {'player': p,'clan':c,'kills':kills,'deaths':deaths,'pageinfo':page, 'timespan':timespan, 'nk':nk, 'nd':nd, 'prefix':prefix,'postfix':postfix})
+def player_html(request, playername, kpage, dpage, timespan=''):
+	return render_to_response('player.html', player(request, playername, kpage, dpage, timespan=''))
+	
+def player_json(request, playername):
+	pd = {}
+	try:	
+		p = Player.objects.get(name=playername)		
+	#if the request contains a ?weapon=bomb term or something like that
+		if request.GET.__contains__("weapon"):
+			weapon = request.GET["weapon"]
+			pd["weapon"] = weapon
+			pd["wkills"] =  Kill.objects.filter(player=p,weapon__name=weapon).count()
+			pd["wlast"] = str(Kill.objects.filter(player=p,weapon__name=weapon)[0])
+			pd["wdeaths"]= Kill.objects.filter(victim__name=playername,weapon__name=weapon).count()
+			pd["wdlast"]= str(Kill.objects.filter(victim__name=playername,weapon__name=weapon)[0])
+
+		pd["name"] = p.name
+		pd["clan"] = p.clan.name
+		pd["kills"] = p.kills
+		pd["deaths"] = p.deaths
+		pd["kd"] = 0 if p.deaths is 0 else p.kills/float(p.deaths)
+		pd["success"] = True
+	except Exception as e:
+		pd = {"name":playername}
+		pd["success"] = False
+		
+	return HttpResponse(json.dumps(pd), mimetype="application/json")
+
+#Sentinel: c&p format changed it up
+'''
+def kills_json(request, playername,weapon):
+	pd = {}
+	try:		
+		p = Player.objects.filter(name=playername)
+		pd["names"] = p[0]
+		pd["weapon"] = weapon
+		pd["kills"] =  Kill.objects.filter(player=p,weapon__name=weapon).count()
+		pd["last"] = Kill.objects.filter(player=p,weapon__name=weapon)[0]
+		pd["success"] = True
+	except Exception as e:
+		pd = {"name":playername}
+		pd["success"] = False
+		
+	return HttpResponse(json.dumps(pd), mimetype="application/json")
+'''
 
 def clan(request, clanname, timespan=''):
 	try:
