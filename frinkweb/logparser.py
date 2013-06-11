@@ -409,11 +409,6 @@ class LogParser(object):
 					int(hour),
 					int(minute),
 					int(second))+timedelta(days=(self.ss.days + dmod)))
-		'''
-		except Exception as e:
-			print logtime
-			print e
-		'''
 
 
 
@@ -476,6 +471,7 @@ class LogParser(object):
 			for line in chats:
 				if PRINT_DEBUG: print line
 				ts = self.parse_time(line.split()[0])
+<<<<<<< HEAD
 				if (ts > (datetime.now() - CHAT_ARCHIVE)):
 					pname = re.search('(<.*?>)',line).groups()[0].strip('<>')
 					if pname is '':
@@ -485,6 +481,16 @@ class LogParser(object):
 					if p:
 						c = Chat(player=p,time=ts,text=message)
 						c.save()
+=======
+				pname = re.search('(<.*?>)',line).groups()[0].strip('<>')
+				if pname is '':
+					pname = re.search('(<.*>)',line).groups()[0].strip('<>')
+				message = re.split('<.*?>',line)[1].decode('utf-8','ignore').strip()
+				p = self.ss.get_player(pname)
+				if p:
+					c = Chat(player=p,time=ts,text=message)
+					c.save()
+>>>>>>> a12884c08529cda75bb19415f571c36db528416b
 
 	def first_run(self):
 		clan, created = Clan.objects.get_or_create(name="NoClan")

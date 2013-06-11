@@ -185,6 +185,7 @@ class TopCategory(models.Model):
 		return self.name
 		
 class TopTable(models.Model):
+	tag = models.CharField(max_length=32)
 	start = models.DateTimeField()
 	end = models.DateTimeField()
 	last_update = models.DateTimeField()
@@ -228,7 +229,7 @@ class Session(models.Model):
 	kd = models.DecimalField(decimal_places=2,max_digits=5,default="0.0")
 	life_set = models.ManyToManyField(Life)
 	def __unicode__(self):
-		return self.player
+		return "{0} start:{1} end:{2}".format(self.player.name,self.start,self.end)
 
 class MultiKill(models.Model):
 	player = models.ForeignKey(Player)
