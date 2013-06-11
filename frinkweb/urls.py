@@ -4,7 +4,6 @@ from django.conf.urls.defaults import *
 # from django.contrib import admin
 # admin.autodiscover()
 
-#Sentinel:C&p addition (kills_json)
 urlpatterns = patterns('',
 	url(r'^(?P<timespan>(hourly|daily|weekly|all)?)/?$', 'stats.views.top_players'),
 	url(r'^top_players/?(?P<timespan>(hourly|daily|weekly|all)?)/?$', 'stats.views.top_players'),

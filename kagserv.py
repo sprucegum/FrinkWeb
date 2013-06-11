@@ -46,7 +46,7 @@ from frinkweb.settings import KAG_DIR
 MEMLIMIT = 200 		# megabytes, restart the server even if occupied if it hits this RAM limit.
 RESTART_PERIOD = 20 	# minutes, minimum time between restarts 
 POLL_PERIOD = 10	# seconds, how often to see how many people are playing, perform logic.
-UPDATE_PERIOD = 30	# minutes, how often to check for KAG updates.
+UPDATE_PERIOD = 30	# minutes, how often to check for updates.
 STATS_PERIOD = 10	# seconds, how often to update stats.
 ROTATE_MAPS = True
 
@@ -66,8 +66,7 @@ class KagServer(object):
 		self.last_stats_update = time()
 
 	def get_players(self):
-		with open('{0}Logs/stats.txt'.format(KAG_DIR),'r') as stats:
-			return int(stats.read().split()[3])
+		return self.ss.pcount()
 
 
 	def start_server(self):
@@ -110,7 +109,7 @@ class KagServer(object):
 			return -1
 
 	def kill_server(self):
-		self.ss.close_sessions()
+		self.ss.server_stop()
 		self.timer.cancel()
 		self.run_manager = False
 		self.KAG.terminate()
@@ -118,13 +117,13 @@ class KagServer(object):
 	def restart_server(self):
 		if ROTATE_MAPS:
 			self.rotate_map()
-		self.ss.restarts += 1
-		lp = self.parse_live()
-		if lp:
-			lp.close_livelog()
-			lp = None
-		self.kill_server()
-		self.KAG = self.start_server()
+			self.ss.server_restart()
+			lp = self.parse_live()
+			if lp:
+				lp.close_livelog()
+				lp = None
+			self.kill_server()
+			self.KAG = self.start_server()
 		
 	
 	def parse_old(self):

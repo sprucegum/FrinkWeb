@@ -19,7 +19,7 @@ frink@arena:~/kag-linux32-dedicated/frinkweb$ python
 
 frink@arena:~/kag-linux32-dedicated$ screen
 frink@arena:~/kag-linux32-dedicated$ python
->>> from kagserv import *		# This starts the management script and KAG server
+>>> from kagserver import *		# This starts the management script and KAG server
 # You'll see KAG start up now, there are some interactive commands you can use like
 >>> K.state()
 Players:17 Uptime:3.6h Mem:62.0m Restarts:0  # You'll get a result like this
