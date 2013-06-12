@@ -1,6 +1,6 @@
 # FrinkWeb Specific Constants
 
-KAG_DIR = '/home/frink/frink_stats/'
+KAG_DIR = '/home/jadel/FrinkWeb/'
 
 # Django settings for frinkweb project.
 
@@ -19,7 +19,7 @@ DATABASES = {
         'ENGINE': 'django.db.backends.postgresql_psycopg2', # Add 'postgresql_psycopg2', 'postgresql', 'mysql', 'sqlite3' or 'oracle'.
         'NAME': 'frinkstats',                      # Or path to database file if using sqlite3.
         'USER': 'frink',                      # Not used with sqlite3.
-        'PASSWORD': 'frinkpassword',                  # Not used with sqlite3.
+        'PASSWORD': 'frinkdizzle',                  # Not used with sqlite3.
         'HOST': '',                      # Set to empty string for localhost. Not used with sqlite3.
         'PORT': '',                      # Set to empty string for default. Not used with sqlite3.
     }
@@ -63,7 +63,7 @@ MEDIA_URL = '/media/'
 ADMIN_MEDIA_PREFIX = '/media/'
 
 # Make this unique, and don't share it with anybody.
-SECRET_KEY = 'ah@6atv8ACasde^zhsdfev)5g)r-g=7_i_'
+SECRET_KEY = 'ah@6ata7d9as7asde^zhsdfev)5g)r-g=7_i_'
 
 # List of callables that know how to import templates from various sources.
 TEMPLATE_LOADERS = (

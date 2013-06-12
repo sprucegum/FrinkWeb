@@ -36,10 +36,8 @@ class ServerState(object):
 			
 		@classmethod
 		def load(cls, fpath = './serverstate.pickle'):
-<<<<<<< HEAD
 			fobject = file(fpath,'rb')
 			return pickle.load(fobject)
-=======
 			try:
 				print "Loading server state"
 				fobject = file(fpath,'rb')
@@ -48,7 +46,6 @@ class ServerState(object):
 				print "Failed to load state, creating new server state object"
 				return ServerState()
 			
->>>>>>> a12884c08529cda75bb19415f571c36db528416b
 			
 		def pset(self):
 			pset = []
@@ -64,21 +61,16 @@ class ServerState(object):
 
 		def server_restart(self):
 			self.restarts +=1
-<<<<<<< HEAD
 			self.end_match(self.last_time)
 			self.close_sessions(self.last_time)
 			
 		def server_stop(self):
 			self.end_match(self.last_time)
 			self.close_sessions(self.last_time)
-=======
-			self.end_match(self.last_time)
-			self.close_sessions()
 			
 		def server_stop(self):
 			self.end_match(self.last_time)
 			self.close_sessions(self.last_time)
->>>>>>> a12884c08529cda75bb19415f571c36db528416b
 
 		# Some Processing code.
 		def start_match(self,dtime):
@@ -121,13 +113,9 @@ class ServerState(object):
 				#print e
 				return
 		
-<<<<<<< HEAD
 		def close_sessions(self,dtime):
-=======
-		def close_sessions(self,dtime=None):
 			if not dtime:
 				dtime = self.last_time
->>>>>>> a12884c08529cda75bb19415f571c36db528416b
 			for sesh in self.opensessions.keys():
 				self.end_life(sesh,dtime)
 				self.close_play_session(sesh,dtime)

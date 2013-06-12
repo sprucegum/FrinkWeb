@@ -28,8 +28,8 @@ exit
 
 # fire up the web-app
 cd frinkweb/
-python ./manage.py sql stats
-python ./manage.py syncdb
+python manage.py sql stats
+python manage.py syncdb
 sh webstart.sh
 
 # reload the webserver

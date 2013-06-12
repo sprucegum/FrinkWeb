@@ -1,4 +1,4 @@
 #!/bin/bash
-python manage.py flush
+python2 manage.py flush
 mv ../Parsed/* ../Logs/
-python logparser.py
+python2 logparser.py

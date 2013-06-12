@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/python2
 '''
 FrinkStats Log Parser Utility
 Copyright (C) 2012  Jade Lacosse
@@ -471,7 +471,6 @@ class LogParser(object):
 			for line in chats:
 				if PRINT_DEBUG: print line
 				ts = self.parse_time(line.split()[0])
-<<<<<<< HEAD
 				if (ts > (datetime.now() - CHAT_ARCHIVE)):
 					pname = re.search('(<.*?>)',line).groups()[0].strip('<>')
 					if pname is '':
@@ -481,7 +480,6 @@ class LogParser(object):
 					if p:
 						c = Chat(player=p,time=ts,text=message)
 						c.save()
-=======
 				pname = re.search('(<.*?>)',line).groups()[0].strip('<>')
 				if pname is '':
 					pname = re.search('(<.*>)',line).groups()[0].strip('<>')
@@ -490,7 +488,6 @@ class LogParser(object):
 				if p:
 					c = Chat(player=p,time=ts,text=message)
 					c.save()
->>>>>>> a12884c08529cda75bb19415f571c36db528416b
 
 	def first_run(self):
 		clan, created = Clan.objects.get_or_create(name="NoClan")
