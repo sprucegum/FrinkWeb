@@ -35,6 +35,7 @@ KILL_ARCHIVE = datetime.now() - timedelta(days=30)
 CHAT_ARCHIVE = datetime.now() - timedelta(days=7)
 PRINT_DEBUG = False
 LOG_CHATS = True
+#KAG_DIR = '/home/jadel/FrinkWeb/'
 
 class LogParser(object):
 
@@ -42,6 +43,7 @@ class LogParser(object):
 		self.ss = ss
 		self.freshlog = True
 		self.livelog = None
+		print KAG_DIR
 
 
 	def parse_logs(self):
@@ -706,6 +708,7 @@ class KagApiQThread(Thread):
 
 
 if __name__ == '__main__':
+	print "KAG_DIR:" + KAG_DIR
 	print "FrinkWeb Log Parser\nparsing logs ..."
 	start = datetime.now()
 	lp = LogParser()
