@@ -1,4 +1,4 @@
-#!/usr/bin/python
+#!/usr/bin/python2
 from threading import *
 from Queue import Queue
 from settings import KAG_DIR
@@ -20,7 +20,7 @@ class LogDemon(Thread):
 		while True:
 			chat = self.pqueue.get()
 			print chat
-			call(['python','logparser.py',chat])
+			call(['python2','logparser.py',chat])
 
 			#signals to queue job is done
 			self.pqueue.task_done()
