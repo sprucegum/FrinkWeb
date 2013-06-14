@@ -38,7 +38,7 @@ if __name__ == '__main__':
 			t = LogDemon(pqueue)
 			t.setDaemon(True)
 			t.start()
-			sleep(10)
+			sleep(5)
 
 		#populate queue with data
 	

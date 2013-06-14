@@ -502,7 +502,7 @@ class LogParser(object):
 		for cname,clan in self.ss.clans.iteritems():
 			clan.update_kd(live=False)
 
-	def get_timespan(timespan):
+	def get_timespan(self, timespan):
 		tspan = datetime.now()
 		if timespan.count('daily'):
 			tspan = datetime.now() - timedelta(hours=24)
