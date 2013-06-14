@@ -37,7 +37,7 @@ class IP(models.Model):
 
 
 class Player(models.Model):
-	name = models.CharField(max_length=50)
+	name = models.CharField(max_length=50,unique=True)
 	ip_set = models.ManyToManyField(IP)
 	printedname = models.CharField(max_length=60)
 	clan = models.ForeignKey("Clan")
@@ -46,6 +46,8 @@ class Player(models.Model):
 	kd = models.DecimalField(decimal_places=2,max_digits=5,default="0.0")
 	play_time = models.IntegerField(default=0)
 	gold = models.BooleanField(default=False)
+	first_seen = models.DateTimeField(db_index=True)
+	last_seen = models.DateTimeField(db_index=True)
 	admin = models.BooleanField(default=False)
 	jradmin = models.BooleanField(default=False)
 		
@@ -68,7 +70,7 @@ class Player(models.Model):
 		if (self.deaths>10):
 			self.kd = str(self.kills/float(self.deaths))
 		self.save()
-
+		
 	def get_avatar(self):
 		try:
 			a = Avatar.objects.get(player=self)
@@ -135,8 +137,8 @@ class Accident(models.Model):
 		return "{0} {1} died from {2}".format(self.time, self.player, self.cause)
 
 class Clan(models.Model):
-	name = models.CharField(max_length=50)
-	kills = models.IntegerField(default=0)
+	name = models.CharField(max_length=50,unique=True)
+	kills = models.IntegerField(default=0,db_index=True)
 	deaths = models.IntegerField(default=0)
 	kd = models.DecimalField(decimal_places=2,max_digits=5,default="0.0")
 	members = models.IntegerField(default=0)
@@ -169,15 +171,15 @@ class Clan(models.Model):
 
 
 class Weapon(models.Model):
-	name = models.CharField(max_length=50)
+	name = models.CharField(max_length=50,unique=True)
 	def __unicode__(self):
 		return self.name
 
 class Cause(models.Model):
-	name = models.CharField(max_length=50)
+	name = models.CharField(max_length=50,unique=True)
 	def __unicode__(self):
 		return self.name
-		
+				
 class TopCategory(models.Model):
 	name = models.CharField(max_length=80)
 	title = models.CharField(max_length=80)
@@ -195,19 +197,29 @@ class TopTable(models.Model):
 		
 class TopEntry(models.Model):
 	player = models.ForeignKey(Player)
-	rank = models.IntegerField(default=0,db_index=True)
+	rank = models.IntegerField(default=0)
+	table = models.ForeignKey(TopTable)
+	kills = models.IntegerField(default=0)
+	deaths = models.IntegerField(default=0)
+	def __unicode__(self):
+		return self.player.name
+
+class ClanEntry(models.Model):
+	clan = models.ForeignKey(Clan)
+	rank = models.IntegerField(default=0)
 	table = models.ForeignKey(TopTable)
 	kills = models.IntegerField(default=0,db_index=True)
 	deaths = models.IntegerField(default=0)
 	def __unicode__(self):
-		return self.player
+		return self.clan.name
 
-class GameRound(models.Model):
+class Match(models.Model):
 	start = models.DateTimeField()
 	end = models.DateTimeField()
 	gamemap = models.CharField(max_length=255)
 	kills = models.IntegerField(default=0)
 	deaths = models.IntegerField(default=0)
+	winner = models.CharField(max_length=40)
 	def __unicode__(self):
 		return self.gamemap
 		
@@ -218,7 +230,7 @@ class Life(models.Model):
 	start = models.DateTimeField()
 	end = models.DateTimeField()
 	def __unicode__(self):
-		return self.player
+		return self.player.name
 		
 class Session(models.Model):
 	player = models.ForeignKey(Player)
