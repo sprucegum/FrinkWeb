@@ -187,7 +187,7 @@ class TopCategory(models.Model):
 		return self.name
 		
 class TopTable(models.Model):
-	name = models.CharField(max_length=80)
+	#name = models.CharField(max_length=80)
 	title = models.CharField(max_length=80)
 	tag = models.CharField(max_length=32)
 	start = models.DateTimeField()

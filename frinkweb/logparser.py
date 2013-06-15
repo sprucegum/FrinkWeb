@@ -549,7 +549,10 @@ class LogParser(object):
 		start_time = self.get_timespan(tablerange)
 		end_time = datetime.now()
 		defaults = {'start':start_time,'end':end_time}
-		top_table, table_created = TopTable.objects.get_or_create(name=tablename,title=title, defaults = defaults)
+		print title
+		top_category, category_created = TopCategory.objects.get_or_create(name=tablename,title=title)
+		top_table, table_created = TopTable.objects.get_or_create(category=top_category, title=title, defaults = defaults, 
+last_update=start_time)
 		if clans:
 			table_clans = Clan.objects.filter(members__gte=2)
 			table_players = None
@@ -588,8 +591,7 @@ class LogParser(object):
 				else:
 					te = TopEntry(table=top_table, player=p,kills=kills,deaths=deaths,rank=entryrank+1)
 				te.save()				
-					
-		'''	
+			
 		elif table_players:
 			#updating the tables
 			top = []
@@ -642,27 +644,28 @@ class LogParser(object):
 		TopTable.objects.all().delete()
 		top_table, new_table = TopTable.objects.get_or_create(start = datetime.min, end=datetime.now(), last_update=datetime.now(), category=top_cat)
 		top_table.save()
-		rank = 0
-		'''	
+		rank = 0	
 
 
 	def delete_archival_records(self):
 		print "Deleting old records"
 		# Delete details from the database that have been archived
 		Kill.objects.filter(time__lte=KILL_ARCHIVE).delete()
-		Chat.objects.filter(time__lte=CHAT_ARCHIVE).delete()
-
-	
-		print (datetime.now()-start_time)
+		Chat.objects.filter(time__lte=CHAT_ARCHIVE).delete()	
 		start_time = datetime.now()
 		print "updating database"
-		TopEntry.objects.filter(table=top_table).delete()
+		#TopEntry.objects.filter(table=top_table).delete()
+		''''
 		for player in top_players:
 			#print "{0:.8}".format(frink_matrix[rank])
 			top_entry = TopEntry(player=player,rank=rank, table=top_table, kills = player.kills, deaths=player.deaths)
 			top_entry.save()
 			rank += 1
 		print (datetime.now()-start_time)
+
+		'''
+
+
 
 	def calculate_kds(self):
 		for pname,player in self.ss.players.iteritems():
