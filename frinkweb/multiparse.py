@@ -10,7 +10,7 @@ from datetime import datetime
 from logparser import *
 
 path.append('./')
-THREADS = 5	# Set this to your cores + 1
+THREADS = 2	# Set this to your cores + 1
 class LogDemon(Thread):
 	def __init__(self, pqueue):
 		Thread.__init__(self)

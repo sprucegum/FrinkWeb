@@ -585,8 +585,9 @@ last_update=start_time)
 			else:
 				for clan in table_clans:
 					players = Player.objects.filter(clan=clan).values_list('id',flat=True)
-					kills = TopEntry.objects.filter(table__name=tablerange,player__id__in=players).aggregate(Sum('kills'))['kills__sum']
-					deaths = TopEntry.objects.filter(table__name=tablerange,player__id__in=players).aggregate(Sum('deaths'))['deaths__sum']
+					print tablerange
+					kills = TopEntry.objects.filter(table__tag=tablerange,player__id__in=players).aggregate(Sum('kills'))['kills__sum']
+					deaths = TopEntry.objects.filter(table__tag=tablerange,player__id__in=players).aggregate(Sum('deaths'))['deaths__sum']
 					if kills and deaths:
 						top.append((clan,kills,deaths))
 			
