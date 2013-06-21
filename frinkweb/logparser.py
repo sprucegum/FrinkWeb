@@ -473,7 +473,7 @@ class LogParser(object):
 			for line in chats:
 				if PRINT_DEBUG: print line
 				ts = self.parse_time(line.split()[0])
-				if (ts > (datetime.now() - CHAT_ARCHIVE)):
+				if (ts > CHAT_ARCHIVE):
 					pname = re.search('(<.*?>)',line).groups()[0].strip('<>')
 					if pname is '':
 						pname = re.search('(<.*>)',line).groups()[0].strip('<>')
