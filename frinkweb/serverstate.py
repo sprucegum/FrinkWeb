@@ -153,7 +153,7 @@ class ServerState(object):
 					print pname + ':' + p.name
 					return p
 				except:
-						p = Player(name=pname,clan=self.get_clan('NoClan'))
+						p = Player(name=pname,first_seen=last_time, last_seen=last_time ,clan=self.get_clan('NoClan')
 						p.save()
 						self.players[pname] = p
 						print pname + ':' + p.name

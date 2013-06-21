@@ -4,5 +4,6 @@ DATABASE frinkstats TO frink;" | sudo -u postgres psql
 python2 ./manage.py syncdb
 python2 ./manage.py sql stats
 python2 ./manage.py syncdb
+mv ../Work/* ../Logs/
 mv ../Parsed/* ../Logs/
 python2 multiparse.py

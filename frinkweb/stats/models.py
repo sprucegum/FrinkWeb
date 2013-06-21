@@ -195,7 +195,7 @@ class TopTable(models.Model):
 	last_update = models.DateTimeField()
 	category = models.ForeignKey(TopCategory)
 	def __unicode__(self):
-		return self.category
+		return self.title
 		
 class TopEntry(models.Model):
 	player = models.ForeignKey(Player)

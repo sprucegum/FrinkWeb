@@ -43,7 +43,7 @@ class LogParser(object):
 		self.ss = ss
 		self.freshlog = True
 		self.livelog = None
-		print KAG_DIR
+		#print KAG_DIR
 
 
 	def parse_logs(self):
@@ -58,8 +58,8 @@ class LogParser(object):
 
 			clogname, console_logs = self.matching_console_log(chat,console_logs)
 			self.set_day(chat)
-			print KAG_DIR +'Logs/'+chat
-			print KAG_DIR +'Logs/'+clogname
+#			print KAG_DIR +'Logs/'+chat
+#			print KAG_DIR +'Logs/'+clogname
 			logfile = open(KAG_DIR +'Logs/'+chat)
 			clogfile = open(KAG_DIR + 'Logs/'+clogname)
 			log = logfile.readlines()
@@ -78,8 +78,8 @@ class LogParser(object):
 		console_logs = self.get_console_logs()
 		clogname, console_logs = self.matching_console_log(chat,console_logs)
 		self.set_day(chat)
-		print KAG_DIR +'Logs/'+chat
-		print KAG_DIR +'Logs/'+clogname
+		#print KAG_DIR +'Logs/'+chat
+		#print KAG_DIR +'Logs/'+clogname
 		move(KAG_DIR + '''Logs/{0}'''.format(chat), KAG_DIR + '''Work/{0}'''.format(chat))
 		move(KAG_DIR + '''Logs/{0}'''.format(clogname), KAG_DIR + '''Work/{0}'''.format(clogname))
 		logfile = open(KAG_DIR +'Work/'+chat)
@@ -520,6 +520,12 @@ class LogParser(object):
 	def make_top_tables(self):
 		self.delete_top_tables()
 		# Make daily,hourly,monthly,and (all-time) tables
+		top_cat, new_cat = TopCategory.objects.get_or_create(name="top50_players",title="Top Players")
+		top_cat.save()
+		TopTable.objects.all().delete()
+		top_table, new_table = TopTable.objects.get_or_create(start = datetime.min, end=datetime.now(), last_update=datetime.now(), category=top_cat)
+		top_table.save()
+		
 		for tablerange in ['daily','hourly','weekly','monthly','all']:
 			title = "{0} Kills".format(tablerange.capitalize())
 			print title
@@ -551,7 +557,9 @@ class LogParser(object):
 		defaults = {'start':start_time,'end':end_time}
 		print title
 		top_category, category_created = TopCategory.objects.get_or_create(name=tablename,title=title)
-		top_table, table_created = TopTable.objects.get_or_create(category=top_category, title=title, defaults = defaults, 
+		if category_created:
+			top_category.save()
+		top_table, table_created = TopTable.objects.get_or_create(category=top_category, title=title, defaults = defaults,
 last_update=start_time)
 		if clans:
 			table_clans = Clan.objects.filter(members__gte=2)
@@ -637,14 +645,14 @@ last_update=start_time)
 				
 					te.save()
 
-	def build_top_tables(self):
-		start_time = datetime.now()
-		top_cat, new_cat = TopCategory.objects.get_or_create(name="top50_players",title="Top Players")
-		top_cat.save()
-		TopTable.objects.all().delete()
-		top_table, new_table = TopTable.objects.get_or_create(start = datetime.min, end=datetime.now(), last_update=datetime.now(), category=top_cat)
-		top_table.save()
-		rank = 0	
+	#def build_top_tables(self):
+		#start_time = datetime.now()
+		#top_cat, new_cat = TopCategory.objects.get_or_create(name="top50_players",title="Top Players")
+		#top_cat.save()
+		#TopTable.objects.all().delete()
+		#top_table, new_table = TopTable.objects.get_or_create(start = datetime.min, end=datetime.now(), last_update=datetime.now(), category=top_cat)
+		#top_table.save()
+		#rank = 0	
 
 
 	def delete_archival_records(self):

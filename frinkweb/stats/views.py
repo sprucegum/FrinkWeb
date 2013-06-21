@@ -23,7 +23,7 @@ from datetime import datetime, timedelta
 from banner import Banner
 from django.http import HttpResponse
 from blacklist import *
-from heapq import nlargest 
+from heapq import nlargest
 import json
 
 
@@ -44,7 +44,7 @@ def get_timespan(timespan):
 
 def top_players(request,timespan='all'):
 
-	top_cat = TopCategory.objects.get(name="top50_players",title="Top Players")
+	top_cat = TopCategory.objects.get(name=timespan)
 	top_table = TopTable.objects.get(category=top_cat)
 	top_player_entries = TopEntry.objects.filter(table=top_table).order_by('rank')[0:50]
 	n_players = top_player_entries.count()
